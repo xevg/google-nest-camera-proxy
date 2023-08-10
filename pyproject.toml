@@ -9,9 +9,6 @@ readme = "README.md"
 [tool.poetry.scripts]
 google-nest-camera-proxy = 'google_nest_camera_proxy:google_nest_camera_proxy'
 
-[tool.semantic_release]
-version_variable = "pyproject.toml:version"
-
 [tool.poetry.dependencies]
 python = "^3.9"
 python-google-nest = "^5.1.1"
