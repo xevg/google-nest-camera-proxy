@@ -2,7 +2,20 @@
 
 
 
-## v0.1.1 (2023-08-10)
+## v0.1.2 (2023-08-10)
+
+### Fix
+
+* fix(ci-cd): Added testpypi back ([`e2ac1fa`](https://github.com/xevg/google-nest-camera-proxy/commit/e2ac1fa41bcefd4e7a542b39abb271c78123b7d3))
+
+* fix(ci-cd): Took out ci-cd for now ([`8e74dda`](https://github.com/xevg/google-nest-camera-proxy/commit/8e74dda9a57e5bf9856edb784d68fd991428cefd))
+
+* fix(tests): Added dummy test ([`ff16c24`](https://github.com/xevg/google-nest-camera-proxy/commit/ff16c2434b7fa19b1dc8a19c2ba5d28a84fa1334))
+
+* fix(tests): Added dummy test ([`bc9c77f`](https://github.com/xevg/google-nest-camera-proxy/commit/bc9c77f085bc58ac454c9617f21482f56073a2d5))
+
+
+## v0.1.1 (2023-08-11)
 
 ### Fix
 
