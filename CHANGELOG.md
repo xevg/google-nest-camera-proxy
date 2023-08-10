@@ -2,7 +2,14 @@
 
 
 
-## v0.0.1 (2023-08-10)
+## v0.1.1 (2023-08-10)
+
+### Fix
+
+* fix(tests): Added dummy test ([`0aabfcd`](https://github.com/xevg/google-nest-camera-proxy/commit/0aabfcd00d176114e61b8fe1337c42329c69a825))
+
+
+## v0.1.0 (2023-08-11)
 
 ### Fix
 
