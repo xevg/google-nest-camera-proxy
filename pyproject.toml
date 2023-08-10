@@ -6,6 +6,12 @@ authors = ["Xev Gittler"]
 license = "MIT"
 readme = "README.md"
 
+[tool.poetry.scripts]
+google-nest-camera-proxy = 'google_nest_camera_proxy:google_nest_camera_proxy'
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 python-google-nest = "^5.1.1"
@@ -22,6 +28,7 @@ pytest-cov = "^4.1.0"
 myst-nb = {version = "^0.17.2", python = "^3.9"}
 sphinx-autoapi = "^2.1.1"
 sphinx-rtd-theme = "^1.2.2"
+python-semantic-release = "^8.0.5"
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:version" # version location

@@ -1,4 +1,4 @@
-# Script to save output from Nest Cameras
+# Script to proxy output from Nest Cameras
 
 import configparser
 import logging
