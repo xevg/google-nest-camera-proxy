@@ -2,7 +2,45 @@
 
 
 
-## v0.1.2 (2023-08-10)
+## v0.9.1 (2023-08-11)
+
+### Documentation
+
+* docs: Cleaned up README file and bumped the version ([`c5e4fc4`](https://github.com/xevg/google-nest-camera-proxy/commit/c5e4fc42a92f1ee8df2db0914261e5f4de64f6e0))
+
+### Fix
+
+* fix: fixed the local imports ([`a844fd2`](https://github.com/xevg/google-nest-camera-proxy/commit/a844fd2f2b2ebed5f5c9ab15c5d3ee9f1e92b732))
+
+### Unknown
+
+* fix (test): Fiddled with it again ([`58c30ba`](https://github.com/xevg/google-nest-camera-proxy/commit/58c30ba2c412875aaa1b5438858fba6c67610cba))
+
+* tests: Fiddled with it ([`a22da21`](https://github.com/xevg/google-nest-camera-proxy/commit/a22da21e861ea81ee6662c41054fda90a94f9bc2))
+
+
+## v0.9.0 (2023-08-11)
+
+### Fix
+
+* fix(cleanup): Cleaned up some of the files ([`422af7c`](https://github.com/xevg/google-nest-camera-proxy/commit/422af7c47cf733161c174ed0ec4a4e7b442707aa))
+
+* fix(tests): dummy tests ([`38662dc`](https://github.com/xevg/google-nest-camera-proxy/commit/38662dcaf7c48bb96ab63241a7ee6395e1a82fc6))
+
+* fix(ci-cd): Fixed codecov config ([`ff07057`](https://github.com/xevg/google-nest-camera-proxy/commit/ff0705720346c385b376e4061ec3a6753b07cc8e))
+
+* fix(ci-cd): Fixed codecov config ([`260f375`](https://github.com/xevg/google-nest-camera-proxy/commit/260f375b18f6841dc034137a513d00b0bbb850bb))
+
+* fix(tests): Added dummy_2 ([`0e1b024`](https://github.com/xevg/google-nest-camera-proxy/commit/0e1b024a32fd6b91b09efe277562707f8eae64d6))
+
+* fix(ci-cd): Fixed an error in the ci-cd file ([`b6ed3f3`](https://github.com/xevg/google-nest-camera-proxy/commit/b6ed3f38c87eee3c1edb07eac0976dd2ce731577))
+
+* fix(ci-cd): Tried again ([`d8d3e15`](https://github.com/xevg/google-nest-camera-proxy/commit/d8d3e159a18ff6c0b596f4fc3b9d3bcc2898fbc4))
+
+* fix(ci-cd): Tried again ([`9ab3fe3`](https://github.com/xevg/google-nest-camera-proxy/commit/9ab3fe37a415acdfd87ea56b4b3f1ac576cfd0b6))
+
+
+## v0.1.2 (2023-08-11)
 
 ### Fix
 
