@@ -26,7 +26,7 @@ jobs:
       - name: Test with pytest
         run: poetry run pytest tests/ --cov=google_nest_camera_proxy --cov-report=xml
 
-      - name: Use Codecov to track coverage
+      - name: Use Codecov to track and report on coverage
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
