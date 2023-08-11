@@ -5,7 +5,7 @@ import re
 import configparser
 import subprocess
 import threading
-from camera import Camera
+from .camera import Camera
 
 
 class RTSPServer:

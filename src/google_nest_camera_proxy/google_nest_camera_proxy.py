@@ -10,8 +10,8 @@ import nest
 from colorama import Fore
 from colorama import Style
 
-from auth import AuthCredentials
-from rtsp_server import RTSPServer
+from .auth import AuthCredentials
+from .rtsp_server import RTSPServer
 
 
 @click.command()
@@ -99,7 +99,7 @@ def google_nest_camera_proxy(configuration_file, debug):
                         device_name = f"{device_name} {custom_name}"
 
                     # Do a lazy load to avoid circular dependencies
-                    from camera import Camera
+                    from .camera import Camera
                     camera = Camera(credentials, configuration, device, device_name, device_id)
                     _LOGGER.warning(f"{Fore.BLUE}Added camera {camera.name}{Style.RESET_ALL}")
                     camera_list.append(camera)

@@ -10,7 +10,7 @@ import nest.nest
 from dateutil import parser
 from dateutil import tz
 
-from auth import AuthCredentials
+from .auth import AuthCredentials
 
 
 def _get_legal_camera_name(name: str) -> str:
