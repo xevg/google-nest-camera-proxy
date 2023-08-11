@@ -1,0 +1,10 @@
+
+[AUTH]
+    client_id = client_id
+    client_secret = client_secret
+    project_id = project_id
+    access_token_cache_file = ./token_cache
+
+[RTSP_SERVER]
+    executable = /Users/xev/Projects/Nest/rtsp-simple-server/rtsp-simple-server
+    config_filename = /Users/xev/.config/nest/rtsp.yml
