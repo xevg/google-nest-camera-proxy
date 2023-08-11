@@ -2,7 +2,14 @@
 
 
 
-## v0.9.1 (2023-08-11)
+## v0.9.2 (2023-08-11)
+
+### Fix
+
+* fix: fixed the GH_TOKEN ([`8946108`](https://github.com/xevg/google-nest-camera-proxy/commit/8946108370a4d6449ae2d42da1712b6796eed5a2))
+
+
+## v0.9.1 (2023-08-12)
 
 ### Documentation
 
