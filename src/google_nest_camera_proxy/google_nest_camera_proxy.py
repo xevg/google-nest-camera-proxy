@@ -100,7 +100,7 @@ def google_nest_camera_proxy(configuration_file, debug):
 
                     # Do a lazy load to avoid circular dependencies
                     from .camera import Camera
-                    camera = Camera(credentials, configuration, device, device_name, device_id)
+                    camera = Camera(configuration, device, device_name, device_id)
                     _LOGGER.warning(f"{Fore.BLUE}Added camera {camera.name}{Style.RESET_ALL}")
                     camera_list.append(camera)
                     rtsp_server.add_camera(camera)

@@ -10,7 +10,7 @@ import nest.nest
 from dateutil import parser
 from dateutil import tz
 
-from .auth import AuthCredentials
+# from .auth import AuthCredentials
 
 
 def _get_legal_camera_name(name: str) -> str:
@@ -23,12 +23,12 @@ def _get_legal_camera_name(name: str) -> str:
 class Camera:
     """ The Nest Camera Class"""
 
-    def __init__(self, credentials: AuthCredentials, configuration: ConfigParser, device: nest.nest.Device,
+    def __init__(self, configuration: ConfigParser, device: nest.nest.Device,
                  device_name: str, device_id: str) -> None:
 
         # Initial Parameter Settings
 
-        self._credentials = credentials
+        # self._credentials = credentials
         self._configuration = configuration
         self._camera = device
 
