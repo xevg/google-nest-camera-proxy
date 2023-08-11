@@ -2,7 +2,18 @@
 
 
 
-## v0.9.2 (2023-08-11)
+## v0.9.3 (2023-08-11)
+
+### Fix
+
+* fix: Try fixing cd again ([`a643708`](https://github.com/xevg/google-nest-camera-proxy/commit/a643708d6dbe892167617d7f6ec309e804d4207c))
+
+### Test
+
+* test: dummy test ([`224f64b`](https://github.com/xevg/google-nest-camera-proxy/commit/224f64b6efc8d37e25a7f4d1d6adce9de3a14cf4))
+
+
+## v0.9.2 (2023-08-12)
 
 ### Fix
 
