@@ -165,16 +165,16 @@ class Camera:
         self._terminate_signal.set()
 
     def __lt__(self, obj):
-        return ((self.legal_camera_name) < (obj.legal_camera_name))
+        return self.legal_camera_name < obj.legal_camera_name
 
     def __gt__(self, obj):
-        return ((self.legal_camera_name) > (obj.legal_camera_name))
+        return self.legal_camera_name > obj.legal_camera_name
 
     def __le__(self, obj):
-        return ((self.legal_camera_name) <= (obj.legal_camera_name))
+        return self.legal_camera_name <= obj.legal_camera_name
 
     def __ge__(self, obj):
-        return ((self.legal_camera_name) >= (obj.legal_camera_name))
+        return self.legal_camera_name >= obj.legal_camera_name
 
     def __eq__(self, obj):
-        return (self.legal_camera_name == obj.legal_camera_name)
+        return self.legal_camera_name == obj.legal_camera_name

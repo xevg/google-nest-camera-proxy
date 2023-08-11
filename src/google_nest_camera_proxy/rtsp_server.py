@@ -91,14 +91,14 @@ class RTSPServer:
                 camera_name = re_match.group(1)
                 self._status[camera_name] = "Publishing"
                 number_not_published[camera_name] = 0
-                self._log.warning(f"<{camera_name}> started publishing after {number_not_published[camera_name]} attempts")
+                self._log.warning(f"<{camera_name}> started publishing after "
+                                  f"{number_not_published[camera_name]} attempts")
 
             re_match = re_reading_from_path.search(line)
             if re_match:
                 camera_name = re_match.group(1)
                 self._log.warning(f"<{camera_name}> Someone started reading the stream")
                 self._status[camera_name] = "Streaming"
-
 
             # If we're not seeing the data published, then we need to reset the feed and get a new token
             for camera_name in number_not_published.keys():
@@ -148,5 +148,3 @@ class RTSPServer:
     @property
     def config_filename(self) -> str:
         return self._config_filename
-
-

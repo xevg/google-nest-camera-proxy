@@ -29,9 +29,9 @@ def google_nest_camera_proxy(configuration_file, debug):
 
     \b
     [AUTH]
-        client_id = client_id from google
-        client_secret = client secret from google
-        project_id = project id from google
+        client_id = client_id from Google
+        client_secret = client secret from Google
+        project_id = project id from Google
         access_token_cache_file = /Users/ME/.config/nest/token_cache
 
     \b
@@ -59,11 +59,6 @@ def google_nest_camera_proxy(configuration_file, debug):
 
     credentials = AuthCredentials(configuration)
 
-    cycle_count = 100
-    max_cycle_count = 30
-    previous_suffix_string = ''
-    camera_list = {}  # List to hold the cameras
-
     _LOGGER.warning(f"{Fore.BLUE}Refreshing the camera list{Style.RESET_ALL}")
 
     # Set up the RTSP Server
@@ -78,7 +73,8 @@ def google_nest_camera_proxy(configuration_file, debug):
             break
 
         except Exception as error:
-            _LOGGER.warning(f"{Fore.RED}Error connecting to Nest ({error=}). Sleeping and trying again.{Style.RESET_ALL}")
+            _LOGGER.warning(f"{Fore.RED}Error connecting to Nest ({error=}). "
+                            f"Sleeping and trying again.{Style.RESET_ALL}")
             time.sleep(30)
 
     max_devices = 5000
@@ -89,7 +85,7 @@ def google_nest_camera_proxy(configuration_file, debug):
             break
 
         device = devices[i]
-        # Because this sometimes gives a rate limiting error, wrap it in a loop ntil it succeeds
+        # Because this sometimes gives a rate limiting error, wrap it in a loop until it succeeds
         while True:
             try:
                 if device.type == 'THERMOSTAT':
@@ -115,7 +111,8 @@ def google_nest_camera_proxy(configuration_file, debug):
                     _LOGGER.error(f"{Fore.RED}Unknown device type '{device.type}'{Style.RESET_ALL}")
                     break
             except Exception as error:
-                _LOGGER.error(f"{Fore.RED}Error connecting to Nest ({error=}). Sleeping and trying again.{Style.RESET_ALL}")
+                _LOGGER.error(f"{Fore.RED}Error connecting to Nest ({error=}). "
+                              f"Sleeping and trying again.{Style.RESET_ALL}")
                 time.sleep(30)
 
     rtsp_server.run()
