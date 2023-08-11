@@ -2,7 +2,22 @@
 
 
 
-## v0.9.3 (2023-08-11)
+## v0.9.4 (2023-08-11)
+
+### Fix
+
+* fix(cicd): Another try to fix pypi ([`e1c20ba`](https://github.com/xevg/google-nest-camera-proxy/commit/e1c20ba438f70f4ad6cea00c67a4a6b6c084776e))
+
+* fix(cicd): Another try to fix codecov ([`d761c17`](https://github.com/xevg/google-nest-camera-proxy/commit/d761c17b133ee16ef1eb3f971a1b1eb8e1a116b1))
+
+* fix(cicd): Another try to fix codecov ([`15faa25`](https://github.com/xevg/google-nest-camera-proxy/commit/15faa255117f3c44d1f6152f1a7cedaa5a60a405))
+
+* fix(test): Another dummy test ([`81826c2`](https://github.com/xevg/google-nest-camera-proxy/commit/81826c232ef83a647f0f0ad34b106ff3e271ba65))
+
+* fix(ci-cd): Trying to get codecov to work ([`d4db4d8`](https://github.com/xevg/google-nest-camera-proxy/commit/d4db4d80f206f67d8c646822a8d4714f606d04d1))
+
+
+## v0.9.3 (2023-08-12)
 
 ### Fix
 
