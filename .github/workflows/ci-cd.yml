@@ -75,6 +75,9 @@ jobs:
           github_token:
             ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Poetry Build
+        run: poetry build
+
       - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
