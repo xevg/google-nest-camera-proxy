@@ -10,12 +10,12 @@ jobs:
     # Define job steps
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
       - name: Check-out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install poetry
         uses: snok/install-poetry@v1
@@ -50,12 +50,12 @@ jobs:
     # Define job steps
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
       - name: Check-out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: xevg/google-nest-camera-proxy
@@ -94,7 +94,3 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-      #  with:
-      #    user: __token__
-      #    password: ${{ secrets.PYPI_API_TOKEN }}
