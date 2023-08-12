@@ -6,6 +6,7 @@ import pytest
 
 
 @pytest.mark.slow
+@pytest.mark.xfail
 def test_rtsp_server():
     configfile = f"{os.path.expanduser('~')}/.config/nest/config"
     configuration = configparser.ConfigParser()

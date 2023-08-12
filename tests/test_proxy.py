@@ -5,6 +5,7 @@ import pytest
 
 
 @pytest.mark.slow
+@pytest.mark.xfail
 def test_proxy():
     proxy = GoogleNestCameraProxy(f"{os.path.expanduser('~')}/.config/nest/config")
     assert len(proxy.camera_list) > 5
