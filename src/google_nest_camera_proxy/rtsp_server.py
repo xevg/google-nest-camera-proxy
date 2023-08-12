@@ -33,6 +33,7 @@ class RTSPServer:
         # Set up a signal if we want to terminate the process
         self._terminate_signal = threading.Event()
         self._rtsp_thread = None
+        self._subprocess = None
 
         return
 
@@ -82,6 +83,10 @@ class RTSPServer:
             re_match = re_not_publishing.search(line)
             if re_match:
                 camera_name = re_match.group(1)
+                if camera_name not in self._status.keys():
+                    self._status[camera_name] = 'Initializing'
+                    number_not_published[camera_name] = 0
+
                 self._status[camera_name] = "Not Publishing"
                 number_not_published[camera_name] += 1
                 self._log.info(f"<{camera_name}> No one publishing, incremented to {number_not_published[camera_name]}")
@@ -89,6 +94,10 @@ class RTSPServer:
             re_match = re_source_ready.search(line)
             if re_match:
                 camera_name = re_match.group(1)
+                if camera_name not in self._status.keys():
+                    self._status[camera_name] = 'Initializing'
+                    number_not_published[camera_name] = 0
+
                 self._status[camera_name] = "Publishing"
                 number_not_published[camera_name] = 0
                 self._log.warning(f"<{camera_name}> started publishing after "
@@ -98,6 +107,10 @@ class RTSPServer:
             if re_match:
                 camera_name = re_match.group(1)
                 self._log.warning(f"<{camera_name}> Someone started reading the stream")
+                if camera_name not in self._status.keys():
+                    self._status[camera_name] = 'Initializing'
+                    number_not_published[camera_name] = 0
+
                 self._status[camera_name] = "Streaming"
 
             # If we're not seeing the data published, then we need to reset the feed and get a new token
@@ -140,6 +153,11 @@ class RTSPServer:
             file_contents = f"{file_contents}\n  {camera.legal_camera_name}:\n    source: {camera.stream_url}\n"
         with open(self._config_filename, "w") as file:
             file.write(prefix + file_contents)
+
+    def terminate(self) -> None:
+        """ Indicate that the threads should terminate """
+        self._log.warning(f"RTSP Terminating")
+        self._terminate_signal.set()
 
     @property
     def status(self) -> dict:

@@ -163,6 +163,7 @@ class Camera:
         """ Indicate that the threads should terminate """
         self._log.warning(f"<{self.name}> Terminating")
         self._terminate_signal.set()
+        self._timer.cancel()
 
     def __lt__(self, obj):
         return self.legal_camera_name < obj.legal_camera_name

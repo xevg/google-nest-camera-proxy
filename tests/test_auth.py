@@ -1,10 +1,11 @@
 import configparser
 import os
 from google_nest_camera_proxy.auth import AuthCredentials
+import pytest
 
 
 def test_auth():
-    configfile = f"{os.path.dirname(__file__)}/test-config"
+    configfile = f"{os.path.expanduser('~')}/.config/nest/config"
     configuration = configparser.ConfigParser()
     configuration.read(configfile)
     creds = AuthCredentials(configuration)

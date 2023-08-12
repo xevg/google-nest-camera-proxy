@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "google_nest_camera_proxy"
-version = "0.9.0"
+version = "0.9.10"
 description = "Proxy your Nest Camera through rtsp-simple-server so you can view it on any RTSP reader"
 authors = ["Xev Gittler"]
 license = "MIT"
@@ -40,6 +40,12 @@ patch_without_tag = true                    # patch release by default
 
 [tool.semantic_release.remote.token]
 env = "GH_TOKEN"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
