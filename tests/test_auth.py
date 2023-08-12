@@ -12,7 +12,8 @@ def test_auth():
     creds = AuthCredentials(configuration)
     assert creds.access_token_cache_file is not None
     assert creds.client_id is not None
-    assert creds.client_secret is not None
+    client_secret = creds.client_secret
+    assert client_secret is not None
     assert creds.project_id is not None
 
 
