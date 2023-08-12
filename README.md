@@ -1,6 +1,6 @@
 # google_nest_camera_proxy
 
-Proxy your Nest Camera through rtsp-simple-server so you can view it on any RTSP reader.
+Proxy your Nest Camera through `mediamtx` so you can view it on any RTSP reader.
 
 ## How Google Nest Cameras Work
 
@@ -45,13 +45,13 @@ Be careful as you follow along the guide in https://developers.google.com/nest/d
 You should end up with the following pieces of information:
 
 - project_id
-   : ID of the project you created in https://console.nest.google.com/device-access ![Project ID.png](images%2FProject%20ID.png)
+   : ID of the project you created in https://console.nest.google.com/device-access ![Project ID.png](./images/ProjectID.png)
 
 - client_id
-   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client ID.png](images%2FClient%20ID.png)
+   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client ID.png](./images/ClientID.png)
 
 - client_secret
-   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client Secret.png](images%2FClient%20Secret.png)
+   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client Secret.png](./images/ClientSecret.png)
 
 
 You will need those values in the next section.
@@ -68,7 +68,7 @@ Most of the configuration lives in a configuration file. Below is a sample file:
     access_token_cache_file = /Users/ME/.config/nest/token_cache
 
 [RTSP_SERVER]
-    executable = /usr/local/bin/rtsp-simple-server
+    executable = /usr/local/bin/mediamtx
     config_filename = /Users/ME/.config/nest/rtsp.yml
 
 ```
@@ -85,10 +85,10 @@ access_token_cache_file
    : Where the token cache is stored
 
 executable
-   : The location you installed the rtsp-simple-server executable.
+   : The location you installed the `mediamtx` executable.
 
 config_filename
-   : The location of the rtsp-simple-server configuration file. This program adds all the cameras to the configuration file
+   : The location of the `mediamtx` configuration file. This program adds all the cameras to the configuration file
 
 ### Authentication
 
@@ -96,7 +96,7 @@ As part of the pyhon-google-nest package installation that is a dependency of th
 
 ## Installation
 
-1) You need to install mediamtx, which you can download at https://github.com/bluenviron/mediamtx. This is the rtsp proxy that I use to translate from Google RTSPS to RTSP. Make a note of where you install it for the configuration file
+1) You need to install `mediamtx`, which you can download at https://github.com/bluenviron/mediamtx. This is the rtsp proxy that I use to translate from Google RTSPS to RTSP. Make a note of where you install it for the configuration file
 2) Install this module
 ```bash 
 $ pip install google_nest_camera_proxy
@@ -116,6 +116,47 @@ Options:
   --help                         Show this message and exit.
 
 ```
+
+## `mediamtx` Configuration
+
+`mediamtx` comes with a default configuration file that you can leave alone except for changing a few parameters. The only ones you *have* to change are `readUser` and `readPass`. You should put in a username and password, and those will need to be provided to the program that reads the camera. 
+
+In addition, `mediamtx` provides a lot of options that you won't need, so you can turn them off. This is optional, but here are my settings for these fields:
+
+```ini
+protocols: [tcp]
+rtmp: no
+hls: no
+webrtc: no
+```
+
+When you `run google-nest-camera-proxy` it regularly modifies the `mediamtx` configuration file, adding the camera configuration to the bottom of it. Do not edit below this line"
+
+```
+# NEST EDITS BELOW -- DO NOT EDIT THIS LINE OR BELOW
+```
+## Configuring SecuritySpy
+
+I have found SecuritySpy (https://bensoftware.com/securityspy/) the best product to view and record cameras. To configure SecuritySpy to view the cameras:
+
+- Open Settings in SecuritySpy
+- Go to the Cameras tab
+- On the bottom left, hit the `+` and select `Add Network Device`
+- In the `Address` box, put the IP address of the box that is running the `mtxmedia` server. In my case, I use 127.0.0.1, since both the server and SecuritySpy are running on the same host
+- Unless you've changed the `rtspAddress` parameter in the `mediamtx.yml` file, put `8554` in the `RTSP port` box.
+- Select `Manual Profile` from the `Profile` dropdown. 
+- If you look in the `mediamtx.yml` file at the bottom, there are lines that look like this. The tag is the name of the camera, and the source is the rtsps stream that changes regularly. Use the name in the file as the name of the camera, and put it in the `Request` box.
+```ini
+  Backyard:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2D61w4Y5ZU2awZvBxZoVD5zE-WgFM5ofLJiMML9NnXLEnEAEGF6Sh1PFqMRG4ynOX1qGu4MgBGjmBwDHgWpkCsHKWybOA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MBhaOhZ0Y5utipHFESKsG4499KfxIs_xuQ8HF1f6vzicaQ9zBGu3yFAWq6bx5hkd5rcrJRmRDjTgfKO96fy9UIYZZAmJptW9r8KGw
+
+  FrontDoor:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr32E11B1alS1QRyq7w4mwEX8NRJEhMnJ_m2mTO9EiXXCEnEAEGF6SmAHpELf7bUIco7Dx3enLdzFi5I?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDNzfcmq51D5VEk8P8ksPEeUNld-xl7BgO0844T-FjXMk7MKqMDYoum6qwYYwtwVGSP5V0KkMgg50E8PP_rUfm6bKp4KG2i50PGxcNOWFi2Uz0EVH1Q8rmCfX6TWHJb-n3I9I2XH6zv3Z-zjLba7fxvSdgmMjPgRfEF61xNOwnOkja3lqva7I6cWkw
+```
+ ![SecuritySpy.png](./images/SecuritySpy.png)
+
+- Click `Apply Preferences` and in just a few minutes it should start receiving the video.
+
 ## Contributing
 
 Interested in contributing? Check out the contributing guidelines. Please note that this project is released with a Code of Conduct. By contributing to this project, you agree to abide by its terms.

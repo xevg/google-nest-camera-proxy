@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.scripts]
-google-nest-camera-proxy = 'google_nest_camera_proxy:google_nest_camera_proxy'
+google-nest-camera-proxy = 'google_nest_camera_proxy.google_nest_camera_proxy:google_nest_camera_proxy'
 
 [tool.poetry.dependencies]
 python = "^3.9"
