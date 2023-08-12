@@ -65,9 +65,7 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install package
-        run: |
-            poetry build
-            poetry install
+        run: poetry install
 
       - name: Use Python Semantic Release to prepare release
         env:
@@ -77,6 +75,9 @@ jobs:
             git config user.name github-actions
             git config user.email github-actions@github.com
             poetry run semantic-release publish
+
+      - name: Poetry Build
+        run: poetry build
 
       - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
