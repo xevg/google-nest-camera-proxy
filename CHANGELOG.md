@@ -2,7 +2,36 @@
 
 
 
-## v0.9.4 (2023-08-11)
+## v0.9.5 (2023-08-12)
+
+### Fix
+
+* fix(cicd): There was a bug ([`39f9baa`](https://github.com/xevg/google-nest-camera-proxy/commit/39f9baaa8a401c7b1a241889fb9f6623611cdbc4))
+
+* fix(cicd): Fixed that, added test pypi back ([`76e6cce`](https://github.com/xevg/google-nest-camera-proxy/commit/76e6cce88dff99141bd17c75e72345e0eda8a571))
+
+* fix(cicd): Maybe because there was no poetry build? ([`ab83507`](https://github.com/xevg/google-nest-camera-proxy/commit/ab83507fbacbe34a3cf45c853eec026de5f3dd8f))
+
+* fix(cicd): Maybe because there was no poetry build? ([`2a5027d`](https://github.com/xevg/google-nest-camera-proxy/commit/2a5027d20ff090694c04e133997b5e541bd57047))
+
+* fix: Updated documentation ([`e291f5f`](https://github.com/xevg/google-nest-camera-proxy/commit/e291f5feb0b2afaef71c1b86652746944a48efa9))
+
+* fix: Fixed pypi again ([`67ed566`](https://github.com/xevg/google-nest-camera-proxy/commit/67ed5664defcac50ab0ce3f5e6dba56bfed7f5a5))
+
+* fix: Fixed Auth and did some tests ([`abfa26f`](https://github.com/xevg/google-nest-camera-proxy/commit/abfa26ffcafd73cbfd0d650e7c3966ae2e2096f4))
+
+### Refactor
+
+* refactor: Updated modules and added tests and fixed tests ([`22124d1`](https://github.com/xevg/google-nest-camera-proxy/commit/22124d110c90602eb458d6ec7ecc590b1f33384f))
+
+* refactor: Updated modules and added tests ([`3e9775a`](https://github.com/xevg/google-nest-camera-proxy/commit/3e9775ac0fb1c7ab7d86e51e6b5673c3201811f6))
+
+### Unknown
+
+* fix(): Took the authenticator out of Camera ([`424d8fa`](https://github.com/xevg/google-nest-camera-proxy/commit/424d8fafa37bb4182c6358d1a597d920a5dd44e0))
+
+
+## v0.9.4 (2023-08-12)
 
 ### Fix
 
