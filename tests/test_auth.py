@@ -4,9 +4,8 @@ from google_nest_camera_proxy.auth import AuthCredentials
 import pytest
 
 
-@pytest.mark.xfail
 def test_auth():
-    configfile = f"{os.path.expanduser('~')}/.config/nest/config"
+    configfile = "./test-config"  # f"{os.path.expanduser('~')}/.config/nest/config"
     configuration = configparser.ConfigParser()
     configuration.read(configfile)
     creds = AuthCredentials(configuration)
