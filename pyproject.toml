@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "google_nest_camera_proxy"
-version = "0.9.11"
+version = "0.9.12"
 description = "Proxy your Nest Camera through rtsp-simple-server so you can view it on any RTSP reader"
 authors = ["Xev Gittler"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.scripts]
-google-nest-camera-proxy = 'google_nest_camera_proxy.google_nest_camera_proxy:google_nest_camera_proxy'
+google-nest-camera-proxy = 'google_nest_camera_proxy:run'
 
 [tool.poetry.dependencies]
 python = "^3.9"
