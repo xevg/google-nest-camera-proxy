@@ -13,11 +13,12 @@ from .rtsp_server import RTSPServer
 
 
 class GoogleNestCameraProxy:
+    """ Gathers the information about the Nest cameras proxies it through mediamtx"""
 
-    def __init__(self, configuration_file: str, debug: bool = False) -> None:
+    def __init__(self, configuration_file: str, no_server: bool = False) -> None:
 
-        self._debug = debug
         self._configfile = configuration_file
+        self._no_server = no_server
         self._configuration = configparser.ConfigParser()
         self._configuration.read(self._configfile)
 
@@ -86,14 +87,19 @@ class GoogleNestCameraProxy:
                                        f"Sleeping and trying again.{Style.RESET_ALL}")
                     time.sleep(30)
 
+        # Now that we have all the cameras configured, write the configuration file
+        self._rtsp_server.write_configuration_file()
+
     def run(self):
-        self._rtsp_server.run()
+        if self._no_server:
+            self._logger.warning(f"{Fore.RED}Not running mediamtx server, please start it manually.{Style.RESET_ALL}")
+        else:
+            self._rtsp_server.run()
 
     def terminate(self):
         self._rtsp_server.terminate()
         for camera in self._camera_list:
             camera.terminate()
-
 
     @property
     def camera_list(self) -> list:

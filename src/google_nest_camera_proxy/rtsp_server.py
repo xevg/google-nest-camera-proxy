@@ -5,6 +5,8 @@ import re
 import configparser
 import subprocess
 import threading
+import time
+
 from .camera import Camera
 
 
@@ -16,6 +18,9 @@ class RTSPServer:
         self._configuration = configuration
         self._camera_list = {}
         self._status = {}
+        self._write_lock = threading.Lock()
+        self._read_user = None
+        self._read_password = None
         self._seperator = "# NEST EDITS BELOW -- DO NOT EDIT THIS LINE OR BELOW\n"
 
         # TODO: Do I want to back up the configuration file?
@@ -28,12 +33,17 @@ class RTSPServer:
         self._executable = configuration.get('RTSP_SERVER', 'executable')
 
         # Set up logging
-        self._log = logging.getLogger(f'RTSP Server')
+        self._logger = logging.getLogger(f'RTSP Server')
 
         # Set up a signal if we want to terminate the process
         self._terminate_signal = threading.Event()
         self._rtsp_thread = None
         self._subprocess = None
+
+        # Start the thread that updates the configuration file
+        self._update_thread = threading.Thread(target=self._update_configuration)
+        self._update_thread.setName('RTSP Configuration Update')
+        self._update_thread.start()
 
         return
 
@@ -48,6 +58,25 @@ class RTSPServer:
 
         self._camera_list[camera.legal_camera_name] = camera
         return
+
+    def _update_configuration(self):
+        """ Check to see if any cameras have updated configurations, and if so, update the configuration file """
+
+        # Wait a couple of minutes to allow the cameras to get added
+        time.sleep(120)
+
+        while True:
+            needs_update = False
+            for camera in self._camera_list.values():
+                if camera.stream_reset:
+                    needs_update = True
+                    camera.stream_reset = False
+            if needs_update:
+                self.write_configuration_file()
+            else:
+                self._logger.info("No changes to configuration file needed")
+
+            time.sleep(60)
 
     def _run_server(self):
         """ Run a single RTSP server """
@@ -79,7 +108,7 @@ class RTSPServer:
             line = self._subprocess.stdout.readline().decode('utf-8').strip()
             if not line:
                 break
-            self._log.info(f"RTSP: {line}")
+            self._logger.info(f"RTSP: {line}")
             re_match = re_not_publishing.search(line)
             if re_match:
                 camera_name = re_match.group(1)
@@ -89,7 +118,8 @@ class RTSPServer:
 
                 self._status[camera_name] = "Not Publishing"
                 number_not_published[camera_name] += 1
-                self._log.info(f"<{camera_name}> No one publishing, incremented to {number_not_published[camera_name]}")
+                self._logger.info(
+                    f"<{camera_name}> No one publishing, incremented to {number_not_published[camera_name]}")
 
             re_match = re_source_ready.search(line)
             if re_match:
@@ -100,13 +130,13 @@ class RTSPServer:
 
                 self._status[camera_name] = "Publishing"
                 number_not_published[camera_name] = 0
-                self._log.warning(f"<{camera_name}> started publishing after "
-                                  f"{number_not_published[camera_name]} attempts")
+                self._logger.warning(f"<{camera_name}> started publishing after "
+                                     f"{number_not_published[camera_name]} attempts")
 
             re_match = re_reading_from_path.search(line)
             if re_match:
                 camera_name = re_match.group(1)
-                self._log.warning(f"<{camera_name}> Someone started reading the stream")
+                self._logger.warning(f"<{camera_name}> Someone started reading the stream")
                 if camera_name not in self._status.keys():
                     self._status[camera_name] = 'Initializing'
                     number_not_published[camera_name] = 0
@@ -117,7 +147,7 @@ class RTSPServer:
             for camera_name in number_not_published.keys():
                 if number_not_published[camera_name] > 5:
                     self._status[camera_name] = "Resetting"
-                    self._log.warning(f"<{camera_name}> Too many failures, trying to reset")
+                    self._logger.warning(f"<{camera_name}> Too many failures, trying to reset")
                     self._camera_list[camera_name].reset()
                     number_not_published[camera_name] = 0
 
@@ -126,7 +156,7 @@ class RTSPServer:
 
         # Check to see if the process has terminated
         if self._subprocess.poll() is not None:
-            self._log.error(f"RTSP process died")
+            self._logger.error(f"RTSP process died")
             self._run_server()
             return
 
@@ -134,29 +164,56 @@ class RTSPServer:
         """ Read the file and save the lines prior to our edits"""
 
         prefix: str = ''
+        found_separator = False
         with open(self._config_filename, 'r') as file:
             for line in file.readlines():
+
+                # We need to add the username and password to the configuration file for each camera, but rather than
+                # hardcode it, I will read it from the more generic one in all
+                re_match = re.search(r"readUser:\W*(.*)$", line)
+                if re_match:
+                    self._read_user = re_match.group(1).strip()
+
+                re_match = re.search(r"readPass:\W*(.*)$", line)
+                if re_match:
+                    self._read_pass = re_match.group(1).strip()
+
                 prefix = prefix + line
                 if line == self._seperator:
+                    found_separator = True
                     break
-
         file.close()
+
+        if not found_separator:
+            prefix = prefix + self._seperator
+
         return prefix
 
     def write_configuration_file(self):
         """ Write the file with all the camera information """
 
-        prefix = self._get_base_file()
-        file_contents = str()
-        for camera_name in sorted(self._camera_list.keys()):
-            camera = self._camera_list[camera_name]
-            file_contents = f"{file_contents}\n  {camera.legal_camera_name}:\n    source: {camera.stream_url}\n"
-        with open(self._config_filename, "w") as file:
-            file.write(prefix + file_contents)
+        self._logger.info("Writing configuration file")
+        self._write_lock.acquire()
+        try:
+            prefix = self._get_base_file()
+            file_contents = str()
+            for camera_name in sorted(self._camera_list.keys()):
+                camera = self._camera_list[camera_name]
+                file_contents = (f"{file_contents}\n"
+                                 f"  {camera.legal_camera_name}:\n"
+                                 f"    source: {camera.stream_url}\n"
+                                 f"    readUser: {self._read_user}\n"
+                                 f"    readPass: {self._read_pass}\n\n")
+            with open(self._config_filename, "w") as file:
+                file.write(prefix + file_contents)
+        except Exception as error:
+            self._logger.error(f"Failed to write configuration file {error=}")
+        finally:
+            self._write_lock.release()
 
     def terminate(self) -> None:
         """ Indicate that the threads should terminate """
-        self._log.warning(f"RTSP Terminating")
+        self._logger.warning(f"RTSP Terminating")
         self._terminate_signal.set()
 
     @property

@@ -34,6 +34,7 @@ class Camera:
 
         self._stream_url = None
         self._terminate_signal = threading.Event()
+        self._stream_reset = True  # True so that it gets written the first time
 
         # Get the camera name
 
@@ -43,7 +44,7 @@ class Camera:
 
         # Start the logger
 
-        self._log = logging.getLogger(f'{self._legal_camera_name}')
+        self._logger = logging.getLogger(f'{self._legal_camera_name}')
 
         # How often we refresh the token. The stream expires after 5 minutes, so no more than 4:30
         self._extension_interval = 4.5 * 60  # 4 minutes 30 seconds
@@ -60,10 +61,13 @@ class Camera:
         return
 
     def __del__(self):
+        self._logger.warning(f"{self.name} terminating")
         self.terminate()
 
     def reset(self):
+        self._logger.warning(f"{self.name} resetting")
         self._get_token()
+        self._stream_reset = True
 
     @property
     def name(self) -> str:
@@ -78,6 +82,15 @@ class Camera:
     @property
     def legal_camera_name(self) -> str:
         return self._legal_camera_name
+
+    @property
+    def stream_reset(self) -> bool:
+        return self._stream_reset
+
+    @stream_reset.setter
+    def stream_reset(self, stream_reset: bool):
+        self._logger.debug("Resetting configuration")
+        self._stream_reset = stream_reset
 
     def _get_token(self) -> None:
         """ Get the Rtsp Stream Token """
@@ -103,16 +116,16 @@ class Camera:
                 message = 'Got token for {}, expiration time: {} - time to expiration = {}'.format(
                     self.name, str(self._expiration_time).split('.')[0],
                     str(self._expiration_time - datetime.datetime.now(tz.tzlocal())).split('.')[0])
-                self._log.info(message)
+                self._logger.info(message)
 
                 # We succeeded in getting the token, so break the loop
                 break
 
             except nest.APIError as error:
-                self._log.error(f"Received a Nest APIError, authenticating camera {error=}. Sleeping for a bit ...")
+                self._logger.error(f"Received a Nest APIError, authenticating camera {error=}. Sleeping for a bit ...")
 
             except Exception as error:
-                self._log.error(f"Unexpected error getting token {error=}, {type(error)=}")
+                self._logger.error(f"Unexpected error getting token {error=}, {type(error)=}")
 
             # Wait till rate limit goes away
             time.sleep(30)
@@ -125,7 +138,7 @@ class Camera:
         # Check to see if we were requested to terminate the process
 
         if self._terminate_signal.is_set():
-            self._log.warning(f"Token renewal for {self.name} ending.")
+            self._logger.warning(f"Token renewal for {self.name} ending.")
             return
 
         try:
@@ -145,14 +158,14 @@ class Camera:
             message = f"Renewed token for {self.name} expiration time: {str(self._expiration_time).split('.')[0]}" \
                       f" - time to expiration = " \
                       f"{str(self._expiration_time - datetime.datetime.now(tz.tzlocal())).split('.')[0]}"
-            self._log.info(message)
+            self._logger.info(message)
 
         except nest.APIError as error:
-            self._log.error(f"Received a Nest APIError, re-authenticating camera {error=}")
+            self._logger.error(f"Received a Nest APIError, re-authenticating camera {error=}")
             self._get_token()
 
         except Exception as error:
-            self._log.error(f"Unexpected error extending token {error=}, {type(error)=}")
+            self._logger.error(f"Unexpected error extending token {error=}, {type(error)=}")
             self._get_token()
 
         # Add the next extension timer
@@ -161,7 +174,7 @@ class Camera:
 
     def terminate(self) -> None:
         """ Indicate that the threads should terminate """
-        self._log.warning(f"<{self.name}> Terminating")
+        self._logger.warning(f"<{self.name}> Terminating")
         self._terminate_signal.set()
         self._timer.cancel()
 
