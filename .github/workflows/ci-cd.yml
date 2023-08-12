@@ -65,8 +65,9 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install package
-        run: poetry build
-             poetry install
+        run: |
+            poetry build
+            poetry install
 
       - name: Use Python Semantic Release to prepare release
         env:
