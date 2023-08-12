@@ -2,6 +2,19 @@
 
 
 
+## v0.9.14 (2023-08-12)
+
+### Fix
+
+* fix: Changed a bunch of stuff ([`da229f9`](https://github.com/xevg/google-nest-camera-proxy/commit/da229f902a5e35e1e8a1045c880e3c2d7f3f8f2d))
+
+* fix(cicd): Updated actions ([`0cb53cc`](https://github.com/xevg/google-nest-camera-proxy/commit/0cb53cccf66e4d3230b70d1eacbc7b481158dc75))
+
+* fix(cicd): Updated actions ([`e6fcfb5`](https://github.com/xevg/google-nest-camera-proxy/commit/e6fcfb5b9fb6e66a36465fdfaf9d310689f869b5))
+
+* fix(cicd): Updated actions ([`ce304e3`](https://github.com/xevg/google-nest-camera-proxy/commit/ce304e3bb0887fe8d75a8d5eb2817fc234d40db5))
+
+
 ## v0.9.13 (2023-08-12)
 
 ### Fix
