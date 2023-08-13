@@ -4,7 +4,7 @@ Proxy your Nest Camera through `mediamtx` so you can view it on any RTSP reader.
 
 ## How Google Nest Cameras Work
 
-Unfortunately, Google does not let you just connect to an RTSP stream, or even and RTSPS string, and read your cameras. It is much more complicated than that. There are a few hoops that you have to jump through:
+Unfortunately, Google does not let you just connect to an RTSP stream, or even an RTSPS string, and read your cameras. It is much more complicated than that. There are a few hoops that you have to jump through:
 1) Go through the Google Device Access Registration Process
 2) Get your Google Authentication Tokens
 3) Create your configuration files
@@ -27,6 +27,16 @@ I'm not going to cover all the details on how to get this done, because it is do
 - https://developers.google.com/nest/device-access/authorize
 - https://developers.google.com/nest/device-access/use-the-api
 - https://developers.google.com/nest/device-access/api/thermostat
+
+## Installation
+
+1) You need to install `mediamtx`, which you can download at https://github.com/bluenviron/mediamtx. This is the rtsp proxy that I use to translate from Google RTSPS to RTSP. Make a note of where you install it for the configuration file
+2) Install this module
+```bash 
+$ pip install google_nest_camera_proxy
+```
+3) Edit the configuration file, whose default location is `~/.config/nest/config`. See the Configuration section below for the details. 
+
 
 ### Basic Instructions 
  
@@ -58,7 +68,7 @@ You will need those values in the next section.
 
 ## Configuration
 
-Most of the configuration lives in a configuration file. Below is a sample file:
+You need to create a confiuration file with the authentication details, and information about setting up the `mediamtx` server. Below is a sample file:
 
 ```
 [AUTH]
@@ -92,27 +102,38 @@ config_filename
 
 ### Authentication
 
-As part of the pyhon-google-nest package installation that is a dependency of this project, it creates a `nest`application. The first time you run `nest show` it will tell you to go to a URL (https://nestservices.google.com/partnerconnections with some parameters), and then you will step through selecting and authorizing the cameras that you want to stream. When you finish this process your browser will have a URL that looks like https://www.google.com/?state=SOME_STATE_VALUE&code=SOME_AUTHENTICATION_CODE&scope=https://www.googleapis.com/auth/sdm.service that you need to copy and paste into the callback, which is then stored  in the ~/.config/nest/token_cache file. 
-
-## Installation
-
-1) You need to install `mediamtx`, which you can download at https://github.com/bluenviron/mediamtx. This is the rtsp proxy that I use to translate from Google RTSPS to RTSP. Make a note of where you install it for the configuration file
-2) Install this module
-```bash 
-$ pip install google_nest_camera_proxy
-```
-3) Edit the configuration file, whose default location is `~/.config/nest/config`. See the Configuration section above for the details. 
+As part of the pyhon-google-nest package installation that is a dependency of this project, it creates a `nest` application. The first time you run `nest show` it will tell you to go to a URL (https://nestservices.google.com/partnerconnections with some parameters), and then you will step through selecting and authorizing the cameras that you want to stream. When you finish this process your browser will have a URL that looks like https://www.google.com/?state=SOME_STATE_VALUE&code=SOME_AUTHENTICATION_CODE&scope=https://www.googleapis.com/auth/sdm.service that you need to copy and paste into the callback, which is then stored  in the ~/.config/nest/token_cache file.
 
 ## Usage
 
 ```
-Usage: google_nest_camera_proxy [OPTIONS]
+Usage: google-nest-camera-proxy [OPTIONS]
 
   Configures the proxy rtsp server, and keeps it updated
 
+  CONFIGURATION
+  -------------
+  The configuration file looks like this:
+
+  [AUTH]
+      client_id = client_id from Google
+      client_secret = client secret from Google
+      project_id = project id from Google
+      access_token_cache_file = /Users/ME/.config/nest/token_cache
+
+  [RTSP_SERVER]
+      executable = /usr/local/bin/rtsp-simple-server
+      config_filename = /Users/ME/.config/nest/rtsp
+
+      See the README.md file to see how to get those values.
+
 Options:
-  -c, --configuration-file PATH  Where the configuration for this program is located
+  -c, --configuration-file PATH  Where the configuration for this program is
+                                 located
+  -v, --verbose                  Turn on more informational output
   -d, --debug                    Turn on debugging output
+  -n, --no-server                Update the file, but don't run the mediamtx
+                                 server as a subprocess
   --help                         Show this message and exit.
 
 ```
@@ -130,7 +151,7 @@ hls: no
 webrtc: no
 ```
 
-When you `run google-nest-camera-proxy` it regularly modifies the `mediamtx` configuration file, adding the camera configuration to the bottom of it. Do not edit below this line"
+When you run `google-nest-camera-proxy` it regularly modifies the `mediamtx` configuration file, adding the camera configuration to the bottom of it. Do not edit below this line"
 
 ```
 # NEST EDITS BELOW -- DO NOT EDIT THIS LINE OR BELOW
@@ -149,9 +170,14 @@ I have found SecuritySpy (https://bensoftware.com/securityspy/) the best product
 ```ini
   Backyard:
     source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2D61w4Y5ZU2awZvBxZoVD5zE-WgFM5ofLJiMML9NnXLEnEAEGF6Sh1PFqMRG4ynOX1qGu4MgBGjmBwDHgWpkCsHKWybOA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MBhaOhZ0Y5utipHFESKsG4499KfxIs_xuQ8HF1f6vzicaQ9zBGu3yFAWq6bx5hkd5rcrJRmRDjTgfKO96fy9UIYZZAmJptW9r8KGw
+    readUser: admin
+    readPass: mysecurepassword
+
 
   FrontDoor:
     source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr32E11B1alS1QRyq7w4mwEX8NRJEhMnJ_m2mTO9EiXXCEnEAEGF6SmAHpELf7bUIco7Dx3enLdzFi5I?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDNzfcmq51D5VEk8P8ksPEeUNld-xl7BgO0844T-FjXMk7MKqMDYoum6qwYYwtwVGSP5V0KkMgg50E8PP_rUfm6bKp4KG2i50PGxcNOWFi2Uz0EVH1Q8rmCfX6TWHJb-n3I9I2XH6zv3Z-zjLba7fxvSdgmMjPgRfEF61xNOwnOkja3lqva7I6cWkw
+    readUser: admin
+    readPass: mysecurepassword
 ```
  ![SecuritySpy.png](./images/SecuritySpy.png)
 
