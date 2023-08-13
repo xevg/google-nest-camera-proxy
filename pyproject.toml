@@ -6,6 +6,9 @@ authors = ["Xev Gittler"]
 license = "MIT"
 readme = "README.md"
 
+[tool.poetry.urls]
+Homepage = "https://github.com/xevg/google-nest-camera-proxy"
+
 [tool.poetry.scripts]
 google-nest-camera-proxy = 'google_nest_camera_proxy:run'
 
