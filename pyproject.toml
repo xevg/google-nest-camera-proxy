@@ -28,7 +28,7 @@ sphinx-rtd-theme = "^1.2.2"
 python-semantic-release = "^8.0.5"
 
 [tool.semantic_release]
-version_variable = "pyproject.toml:version" # version location
+version_variables = ["pyproject.toml:version"] # version location
 branch = "main"                             # branch to make releases of
 changelog_file = "CHANGELOG.md"             # changelog file
 build_command = "pip install poetry && poetry build"              # build dists
