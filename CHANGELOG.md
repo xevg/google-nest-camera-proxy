@@ -2,6 +2,17 @@
 
 
 
+## v0.9.16 (2023-08-13)
+
+### Fix
+
+* fix: minor fixes ([`6984d7a`](https://github.com/xevg/google-nest-camera-proxy/commit/6984d7a71b0b28737c7f46a817fd69c1134e9bbc))
+
+### Unknown
+
+* Merge remote-tracking branch &#39;origin/main&#39; ([`0fee833`](https://github.com/xevg/google-nest-camera-proxy/commit/0fee8338cbc0e0f3688fdb4dc5537e458dbbc790))
+
+
 ## v0.9.15 (2023-08-12)
 
 ### Fix
