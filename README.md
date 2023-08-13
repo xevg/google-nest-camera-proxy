@@ -167,6 +167,7 @@ I have found SecuritySpy (https://bensoftware.com/securityspy/) the best product
 - Unless you've changed the `rtspAddress` parameter in the `mediamtx.yml` file, put `8554` in the `RTSP port` box.
 - Select `Manual Profile` from the `Profile` dropdown. 
 - If you look in the `mediamtx.yml` file at the bottom, there are lines that look like this. The tag is the name of the camera, and the source is the rtsps stream that changes regularly. Use the name in the file as the name of the camera, and put it in the `Request` box.
+- 
 ```ini
   Backyard:
     source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2D61w4Y5ZU2awZvBxZoVD5zE-WgFM5ofLJiMML9NnXLEnEAEGF6Sh1PFqMRG4ynOX1qGu4MgBGjmBwDHgWpkCsHKWybOA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MBhaOhZ0Y5utipHFESKsG4499KfxIs_xuQ8HF1f6vzicaQ9zBGu3yFAWq6bx5hkd5rcrJRmRDjTgfKO96fy9UIYZZAmJptW9r8KGw
