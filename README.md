@@ -55,13 +55,13 @@ Be careful as you follow along the guide in https://developers.google.com/nest/d
 You should end up with the following pieces of information:
 
 - project_id
-   : ID of the project you created in https://console.nest.google.com/device-access ![Project ID.png](./images/ProjectID.png)
+   : ID of the project you created in https://console.nest.google.com/device-access ![](https://github.com/xevg/google-nest-camera-proxy/blob/main/images/ProjectID.png?raw=true)
 
 - client_id
-   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client ID.png](./images/ClientID.png)
+   : value from setting up OAuth in https://console.cloud.google.com/ project ![](https://github.com/xevg/google-nest-camera-proxy/blob/main/images/ClientID.png?raw=true)
 
 - client_secret
-   : value from setting up OAuth in https://console.cloud.google.com/ project ![Client Secret.png](./images/ClientSecret.png)
+   : value from setting up OAuth in https://console.cloud.google.com/ project ![](https://github.com/xevg/google-nest-camera-proxy/blob/main/images/ClientSecret.png?raw=true) 
 
 
 You will need those values in the next section.
@@ -179,7 +179,7 @@ I have found SecuritySpy (https://bensoftware.com/securityspy/) the best product
     readUser: admin
     readPass: mysecurepassword
 ```
- ![SecuritySpy.png](./images/SecuritySpy.png)
+ ![SecuritySpy.png](https://github.com/xevg/google-nest-camera-proxy/blob/main/images/SecuritySpy.png?raw=true)
 
 - Click `Apply Preferences` and in just a few minutes it should start receiving the video.
 
