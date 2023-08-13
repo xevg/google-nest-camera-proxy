@@ -2,6 +2,15 @@
 
 
 
+## v1.0.0 (2023-08-13)
+
+### Breaking
+
+* feat: All ready for publication.
+
+BREAKING CHANGE: move to the next version ([`6c4228e`](https://github.com/xevg/google-nest-camera-proxy/commit/6c4228e041e4b98a705f11e5aad920038bafeb40))
+
+
 ## v0.9.17 (2023-08-13)
 
 ### Fix
