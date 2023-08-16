@@ -62,17 +62,17 @@ class Camera:
 
         # Set up the extension timer
         self._timer = threading.Timer(self._extension_interval, self._renew_token)
-        self._timer.setName(f"{self.name} Extension Timer")
+        self._timer.setName(f"{self.legal_camera_name} Extension Timer")
         self._timer.start()
 
         return
 
     def __del__(self):
-        self._logger.warning(f"{self.name} terminating")
+        self._logger.warning(f"{self.legal_camera_name} terminating")
         self.terminate()
 
     def reset(self):
-        self._logger.warning(f"{self.name} resetting")
+        self._logger.warning(f"{self.legal_camera_name} resetting")
         self._get_token()
         self._stream_reset = True
 
@@ -125,7 +125,7 @@ class Camera:
                     response["results"]["expiresAt"]
                 ).astimezone(tz.tzlocal())
                 message = "Got token for {}, expiration time: {} - time to expiration = {}".format(
-                    self.name,
+                    self.legal_camera_name,
                     str(self._expiration_time).split(".")[0],
                     str(
                         self._expiration_time - datetime.datetime.now(tz.tzlocal())
@@ -158,7 +158,7 @@ class Camera:
         # Check to see if we were requested to terminate the process
 
         if self._terminate_signal.is_set():
-            self._logger.warning(f"Token renewal for {self.name} ending.")
+            self._logger.warning(f"Token renewal for {self.legal_camera_name} ending.")
             return
 
         try:
@@ -184,7 +184,7 @@ class Camera:
                 extend_response["results"]["expiresAt"]
             ).astimezone(tz.tzlocal())
             message = (
-                f"Renewed token for {self.name} expiration time: {str(self._expiration_time).split('.')[0]}"
+                f"Renewed token for {self.legal_camera_name} expiration time: {str(self._expiration_time).split('.')[0]}"
                 f" - time to expiration = "
                 f"{str(self._expiration_time - datetime.datetime.now(tz.tzlocal())).split('.')[0]}"
             )
@@ -208,7 +208,7 @@ class Camera:
 
     def terminate(self) -> None:
         """Indicate that the threads should terminate"""
-        self._logger.warning(f"<{self.name}> Terminating")
+        self._logger.warning(f"<{self.legal_camera_name}> Terminating")
         self._terminate_signal.set()
         self._timer.cancel()
 

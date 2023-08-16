@@ -113,12 +113,15 @@ class RTSPServer:
                 return
 
             line = self._subprocess.stdout.readline().decode("utf-8").strip()
-            if not line:
-                break
             self._logger.info(f"RTSP: {line}")
             re_match = re_not_publishing.search(line)
             if re_match:
                 camera_name = re_match.group(1)
+                if camera_name not in self._camera_list.keys():
+                    self._logger.error(
+                        f"Configuration error: No such camera {camera_name}"
+                    )
+                    continue
                 if camera_name not in self._status.keys():
                     self._status[camera_name] = "Initializing"
                     number_not_published[camera_name] = 0
@@ -168,11 +171,11 @@ class RTSPServer:
                     # After the reset, we may have a new camera stream, so update the config file
                     self.write_configuration_file()
 
-        # Check to see if the process has terminated
-        if self._subprocess.poll() is not None:
-            self._logger.error(f"RTSP process died")
-            self._run_server()
-            return
+            # Check to see if the process has terminated
+            if self._subprocess.poll() is not None:
+                self._logger.error(f"RTSP process died")
+                self._run_server()
+                return
 
     def _get_base_file(self) -> str:
         """Read the file and save the lines prior to our edits"""
