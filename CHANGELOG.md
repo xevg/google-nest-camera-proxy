@@ -2,6 +2,23 @@
 
 
 
+## v1.0.4 (2023-08-16)
+
+### Fix
+
+* fix: Fixed name problems
+
+- Showed a better name for the cameras
+- Fixed an error if the configuration on the reader was wrong
+- Changed the name of the camera to be only the label, unless it is blank (Google was messing up the room names)
+- Fixed an error reading the RTSP process when it was in debug mode
+- Fixed a check for a dead process ([`7d0be19`](https://github.com/xevg/google-nest-camera-proxy/commit/7d0be1971b76b095c44df2b794d62bdf5ce4eb68))
+
+### Unknown
+
+* Merge remote-tracking branch &#39;origin/main&#39; ([`ebf4e23`](https://github.com/xevg/google-nest-camera-proxy/commit/ebf4e23525deb7e5a2920265cbaf5f3c0791dd4f))
+
+
 ## v1.0.3 (2023-08-13)
 
 ### Fix
