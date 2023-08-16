@@ -2,6 +2,13 @@
 
 
 
+## v1.0.3 (2023-08-13)
+
+### Fix
+
+* fix: Trying to get PyPi to recognize the project home. ([`8db64c2`](https://github.com/xevg/google-nest-camera-proxy/commit/8db64c2df8f67f5fd477f32e81e0b7022eecbce1))
+
+
 ## v1.0.2 (2023-08-13)
 
 ### Fix
