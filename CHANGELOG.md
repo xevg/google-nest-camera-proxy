@@ -2,6 +2,19 @@
 
 
 
+## v1.1.0 (2023-08-18)
+
+### Feature
+
+* feat(docker): add docker container
+
+Added a docker container to run out of ([`f5cc667`](https://github.com/xevg/google-nest-camera-proxy/commit/f5cc667adb29183f5fe50a850c59cb77118e2398))
+
+### Unknown
+
+* fix (cicd): Took out TestPyPy ([`0ea5d6a`](https://github.com/xevg/google-nest-camera-proxy/commit/0ea5d6aff0b9aa058ad55ba512b544fced2e2cb4))
+
+
 ## v1.0.4 (2023-08-16)
 
 ### Fix
