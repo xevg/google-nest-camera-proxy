@@ -28,7 +28,7 @@ I'm not going to cover all the details on how to get this done, because it is do
 - https://developers.google.com/nest/device-access/use-the-api
 - https://developers.google.com/nest/device-access/api/thermostat
 
-## Installation
+## Python Installation
 
 1) You need to install `mediamtx`, which you can download at https://github.com/bluenviron/mediamtx. This is the rtsp proxy that I use to translate from Google RTSPS to RTSP. Make a note of where you install it for the configuration file
 2) Install this module
@@ -37,7 +37,18 @@ $ pip install google_nest_camera_proxy
 ```
 3) Edit the configuration file, whose default location is `~/.config/nest/config`. See the Configuration section below for the details. 
 
+## Docker Installation
 
+As an easier alternative to building and running it, you can use the `xevg/google-nest-camera-proxy` Docker image. In order to run it, you first need to create an environment file to pass your authorization information in.
+
+```ini
+CLIENT_ID=1065859646d33c5pmmmggs3dv23sqct9.apps.googleusercontent.com
+CLIENT_SECRET=GOCSPxrkf_AGMjjiHzzfxwppL_Ajy
+PROJECT_ID=a6902db8-b798--334a-475-bbfe091ea6ce
+MTX_READUSER=admin
+MTX_READPASS=mysecurepassword
+
+```
 ### Basic Instructions 
  
 These instructions were taken from the python-google-nest package (https://pypi.org/project/python-google-nest/) which provides the underlying libraries that I use to connect to the cameras. At a high level it involves:
@@ -170,13 +181,13 @@ I have found SecuritySpy (https://bensoftware.com/securityspy/) the best product
 - 
 ```ini
   Backyard:
-    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2D61w4Y5ZU2awZvBxZoVD5zE-WgFM5ofLJiMML9NnXLEnEAEGF6Sh1PFqMRG4ynOX1qGu4MgBGjmBwDHgWpkCsHKWybOA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MBhaOhZ0Y5utipHFESKsG4499KfxIs_xuQ8HF1f6vzicaQ9zBGu3yFAWq6bx5hkd5rcrJRmRDjTgfKO96fy9UIYZZAmJptW9r8KGw
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2D61w4Y5ZU2awZvBxZoVD5zE-WgFM5ofLJiMML9NnXLEnEAEGF6Sh1PFqMRG4ynOX1qGu4MgBGjmBwDHgWpkCsHKWybOA?
     readUser: admin
     readPass: mysecurepassword
 
 
   FrontDoor:
-    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr32E11B1alS1QRyq7w4mwEX8NRJEhMnJ_m2mTO9EiXXCEnEAEGF6SmAHpELf7bUIco7Dx3enLdzFi5I?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDNzfcmq51D5VEk8P8ksPEeUNld-xl7BgO0844T-FjXMk7MKqMDYoum6qwYYwtwVGSP5V0KkMgg50E8PP_rUfm6bKp4KG2i50PGxcNOWFi2Uz0EVH1Q8rmCfX6TWHJb-n3I9I2XH6zv3Z-zjLba7fxvSdgmMjPgRfEF61xNOwnOkja3lqva7I6cWkw
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr32E11B1alS1QRyq7w4mwEX8NRJEhMnJ_m2mTO9EiXXCEnEAEGF6SmAHpELf7bUIco7Dx3enLdzFi5I?
     readUser: admin
     readPass: mysecurepassword
 ```

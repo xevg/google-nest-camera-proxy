@@ -1,0 +1,161 @@
+
+###############################################
+# General parameters
+
+# Sets the verbosity of the program; available values are "error", "warn", "info", "debug".
+logLevel: info
+# Destinations of log messages; available values are "stdout", "file" and "syslog".
+logDestinations: [stdout, file]
+# If "file" is in logDestinations, this is the file which will receive the logs.
+logFile: rtsp-simple-server.log
+
+# Timeout of read operations.
+readTimeout: 10s
+# Timeout of write operations.
+writeTimeout: 10s
+# Number of read buffers.
+# A higher value allows a wider throughput, a lower value allows to save RAM.
+readBufferCount: 512
+
+# Enable the HTTP API.
+api: no
+
+# Enable Prometheus-compatible metrics.
+metrics: no
+
+# Enable pprof-compatible endpoint to monitor performances.
+pprof: no
+
+###############################################
+# RTSP parameters
+
+# Disable support for the RTSP protocol.
+rtspDisable: no
+# List of enabled RTSP transport protocols.
+# UDP is the most performant, but doesn't work when there's a NAT/firewall between
+# server and clients, and doesn't support encryption.
+# UDP-multicast allows to save bandwidth when clients are all in the same LAN.
+# TCP is the most versatile, and does support encryption.
+# The handshake is always performed with TCP.
+protocols: [tcp]
+# Encrypt handshakes and TCP streams with TLS (RTSPS).
+# Available values are "no", "strict", "optional".
+encryption: "no"
+# Address of the TCP/RTSP listener. This is needed only when encryption is "no" or "optional".
+rtspAddress: :8554
+
+# Authentication methods.
+authMethods: [basic, digest]
+
+###############################################
+# RTMP parameters
+
+# Disable support for the RTMP protocol.
+rtmpDisable: yes
+
+###############################################
+# HLS parameters
+
+# Disable support for the HLS protocol.
+hlsDisable: yes
+
+
+###############################################
+# WebRTC parameters
+
+# Disable support for the WebRTC protocol.
+webrtcDisable: yes
+
+###############################################
+# Path parameters
+
+# These settings are path-dependent, and the map key is the name of the path.
+# It's possible to use regular expressions by using a tilde as prefix.
+# For example, "~^(test1|test2)$" will match both "test1" and "test2".
+# For example, "~^prefix" will match all paths that start with "prefix".
+# The settings under the path "all" are applied to all paths that do not match
+# another entry.
+paths:
+  all:
+    # Source of the stream. This can be:
+    # * publisher -> the stream is published by a RTSP or RTMP client
+    # * rtsp://existing-url -> the stream is pulled from another RTSP server / camera
+    # * rtsps://existing-url -> the stream is pulled from another RTSP server / camera with RTSPS
+    # * rtmp://existing-url -> the stream is pulled from another RTMP server / camera
+    # * rtmps://existing-url -> the stream is pulled from another RTMP server / camera with RTMPS
+    # * http://existing-url/stream.m3u8 -> the stream is pulled from another HLS server
+    # * https://existing-url/stream.m3u8 -> the stream is pulled from another HLS server with HTTPS
+    # * redirect -> the stream is provided by another path or server
+    # * rpiCamera -> the stream is provided by a Raspberry Pi Camera
+    source: publisher
+
+    # If the source is an RTSP or RTSPS URL, this is the protocol that will be used to
+    # pull the stream. available values are "automatic", "udp", "multicast", "tcp".
+    sourceProtocol: tcp
+
+    # Tf the source is an RTSP or RTSPS URL, this allows to support sources that
+    # don't provide server ports or use random server ports. This is a security issue
+    # and must be used only when interacting with sources that require it.
+    sourceAnyPortEnable: no
+
+    # If the source is a RTSPS, RTMPS or HTTPS URL, and the source certificate is self-signed
+    # or invalid, you can provide the fingerprint of the certificate in order to
+    # validate it anyway. It can be obtained by running:
+    # openssl s_client -connect source_ip:source_port </dev/null 2>/dev/null | sed -n '/BEGIN/,/END/p' > server.crt
+    # openssl x509 -in server.crt -noout -fingerprint -sha256 | cut -d "=" -f2 | tr -d ':'
+    sourceFingerprint:
+
+    # If the source is an RTSP or RTMP URL, it will be pulled only when at least
+    # one reader is connected, saving bandwidth.
+    sourceOnDemand: no
+
+    # If the source is "publisher" and a client is publishing, do not allow another
+    # client to disconnect the former and publish in its place.
+    disablePublisherOverride: no
+
+    # Username required to read.
+    # SHA256-hashed values can be inserted with the "sha256:" prefix.
+    readUser: admin
+    # password required to read.
+    # SHA256-hashed values can be inserted with the "sha256:" prefix.
+    readPass: RTSPpublishPass
+    # IPs or networks (x.x.x.x/24) allowed to read.
+    readIPs: []
+
+# NEST EDITS BELOW -- DO NOT EDIT THIS LINE OR BELOW
+
+  150DiningRoom:
+    source: rtsps://stream-us1-charlie.dropcam.com:443/sdm_live_stream/CiUA2vuxr2ngbcKZ2vyxwH1kom00Xy9JQpHrWZ3K0-a1MrF81pUuEnEAEGF6SonySKNHLTO2BQmsmbWg-YLlYcjVzFuv0oZ7xcP0tE_7EXt2BBCLMTasSm28QSKzQZwxu1O9gGIlp6MV0DYkUdB2YK00dafm_RC_3PBw26udB_81-Qx2mtSk2o_LFQCI6f4EGNlKIlHeg83CWQ?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI5MH0.fr6F6caHahtzvF8QdMeN1vwZAQ0KKFGICnYpXmxG7nLyDIlgJV2uXQJq6xCq8h4WQDPXHtWdFTBI_S5ywgBGgqypeQZY7elIAbohdyNu72SqUX9Wjhbgf1Dr2HZ08OFwQPJX-sIQU8NXjwiE6T6cvMQHylcTOF8uMhpVlIvMGKHINd2X_rNE8NQlfJpC0Klb97pxUHY6TMtHsyLBKqnW8Hprjx4WxxIOPbpttdVlxCdlZ-pLvVgtRrv1We6ztByFM2qU0Pt2K3mSYy6u8mclwdStOcu4menC6I8dMOtt8hoT59AeIdOmIyeLfq7KSJhtF3YEi1TcZojsmF7dhqDAwQ
+
+  150Kitchen:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxrxD5vCm7Vkv32yJWP79Zl5Qo83PTz1FCHfL9sESQxbZNEnEAEGF6SoOxoyKALBUBzRuYpJmmVq4ixUn67toPoS61g6bKudwxOuB1Nrj9rfVjhplIiPXnknZS_55MFs3S831pj7cOe6RWNc-caD_HrJJghSZQ-MpEcmo3hON9LVMyQYdk4HVjFJJK7iQGCwvnXVYhzA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4M30.n9Md_nqh526kTSXptSjFr8w_6lRdN-N4Y6p47WkmwHNe8GVLxwI4SA-EMFUbgC0DHeJNqxsdTRV-Rp-WjTeMF7ilcPLRyM7_j7Z9IZHql7BpYfbmAbIgeYbimXT095qfap5WsvgPJI66ku-vi9P34Qtg_b3eA8kJOASDbEr1dHJ61CPLP4bvlp-v3bNL1SKUcvJJqFBbumSgeR27opRjEgRMFkm54z0Zh1KKkfjbWQ2Cv0oP6O9JJeKelZwtfWULv9P5wkqIyLbWCwYX5938QQ0mXRNAU_WQQWw0Nu2dVpZw_zSlYxdP51m9eWYO2rTgl75JOL_8xWUxjJUFBDT1VA
+
+  150MasterWindow:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr5eJWc0mkaiEBiR-AH0wG5_c7hbz4dNQmKAEEogtL9dzEnEAEGF6Ss3gIcrBdKk4hroPXvnKYUkKDR6lZ1F3iRtImx0cK4l0pb_HzOcOITqizs085RSncAjJmZK_gDs0ZkLDFepIWjY4vhrYAPRtpmuTTMb1b21uQAYm0Wbhe7lHfWgHQs6J6-K7N8JozZkHvu_YSw?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4Nn0.BMOCF_jvjjd2_VfgY7OhLLNJy7FPU3tdoDkHUgOkqiphEWsJNEB0asmfwpDhsMwAuqpS0VxBSeJqK5ybIRo2g2x6BHJO2Y1oRqDyIhEFCx-W6IyCQBxjARU2YuOW9cmfFS_rx5pH_Twk1VsipAL7Ht6h_xizdCM3f3qAjzwfMfLHBsz47ApPMAmnFRuEem7oR-KvDwEa_bt8yCFC5DQpoBPuKljlNgXrFG0bP7nRRSS8iIfGgpVVBTbed7ZiOxvckD2y6mAG_ibVuObFG8MdzYanzjhY8vSejwCXVbhpAfoqlni47wTpEV6iZRYHWL7DEedRS2e3EcnenwogU7eNTw
+
+  150PlayroomCam3:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr5WF1emhM56l6dfhAWGzXv63eGuzJ7fodYajBIvjKYX3EnEAEGF6SpeAVVICr4qDVCVKb31BvTLkUBF9LdaHNJ6UbRzm-sXaqjjZsWaNZMVuVXr94J4CiRJVRkQjlQqSRlCqT1_tPe2d3a-rIA9_G0wiBzWtYDC_8RslU0hJ5-wolbmAW1VbQsGdgRGGdgEYzoWYOA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4Mn0.qiTnhqBsGeXL7CtXo-s-5CDuoeXLZR-aPqCZWF0u0wZyz2zzQi9235eBiwD8G1lGcVACGikMcug2p0DgoKu5HENsxcmzfsP_WFPoyhom0KE00hkeFLMvYzUZY2b7zkLLb9bpCBdCu5_YjMRwC41IzRkP6fZkxXBgP66oLRTCaVQGt_4dasW7xH00H1NbRt-8Zhbn_8JkBG_PIZgD5iN5O89r6mluyaF_ksRfOSyYKee_vQ24eQkj-nHHjJsb-gtTWSc0i5CCPy7QMMR51iIWGbarjb0EVO45R9WRC5LdyS5lDVbUgSzeyqkJyZglZCvGlqmZDwtGekkGBnD6KuA7mA
+
+  KittensNestLitter:
+    source: rtsps://stream-us1-charlie.dropcam.com:443/sdm_live_stream/CiUA2vuxr3h5f2HFcReX0OR0PgjDJhBwbC67_zu7OJv__qJWVXk2EnEAEGF6SqlvlxWj2Gs5Hl7x47bxPXndiSG-mkMECzk3tTWEVqIAhq_l0nOTJ-k-ZfWik2wry2KzV3hVh-8AH9pGJjPjufZOvvcSmWU8IjYSGHenV5yica0q1JY1p6OuME5oDtnCDJMi6nR4-kUhJeGhZA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4OH0.etP9_QOn0xVQ1kBq3XhGWO1Qe_UkB660Cl4LGyG4kJzB2aAGKkD9Bi99MSQCpATHM4TDxzwRa6PLUDvvyjgg9TJ5dqxn4SI8KFAjwpKKF5q0en2FE0LjYB6s4hRRSuLEDiS5lciwkEfupD2AX-p5Ye9E1LDaYSBdk2ohYy-TZZsdtciexw_jasZhazuFio7_eBSLgKnAMIwaiEkiX31m25MganM_WXDYWThZ7lriqrNbv7yJklTzAnOb3eGByKpT8ksS-zarS6rL4Ewy4Pvr556g7R-trjou_ecH-NnGomV66EbO6THw9qphWHQqkAQf1a4DbXBmlSJsc48jZZfH0Q
+
+  MaxineBedroom:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr9m64r4JbpZJA4xZeaW15T__w6JvwlC3EHNgtGduTe0nEnEAEGF6SggoEl0DTUbIMkmCXH3n20snyZMye3cRV7DHociH5S3G8rL2e8FityyrZF5LLhspU2d06z2Uljr1cEo7Qk4NW7FWiUYwFSt6HWFoX597Q6MQ3feStPpP-R8BOYOZbA4YVVlAPPnplDUTl5V2tw?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4MX0.Jl-GEn2mWxoO7dcsP__-yQFmi1bxEDZ_p7YXrWHEZjWgAxZiqxxBbW9vzSzpEzcXGlLJbRCa60bqrUkMK8kaUO07GCQgEECDleKQfKwGYS2ZKSVmigAeQAFGtyZqbvfIbsc-2n0HX67ZxjTufPSA095QF7ZvL-cozQIFOC6MOOHT-QAbz3RmK_hsKJstlrJkP-OmAnMCYiW8xTUujbAccKdO-Uo0fWGCb-9e1VId5z-4nernH2oML63wLI37e-3NFDbakrBa_J-TSx-Aon-sTigIEl7l5Og2wQbPyq3wzrTZPzykYmT10xLcMKtFmZ7e1WR7UcoJIUVTg0PtDUz_fA
+
+  MaxineKitchen:
+    source: rtsps://stream-ue1-charlie.dropcam.com:443/sdm_live_stream/CiUA2vuxr6kKSI4c0hkQCX79y7Sp76jcN6APZLrKUXi7IJYOQ5koEnEAEGF6SiYuh15PmQV167q1LOhuwVoANi8LXtuJVeDYuP_U9IGM5ydBgpuAxa_IW9wLjlXSihiTM8h_uPQcVLH-MxXT35_TTDLjqWxCmPiZrApsPRcx6MW0LPpIbplfLmzYV3W91RsTBGiEclUyY1tnLg?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4NX0.Qsyu_XuxisoEOZw6oqzz64DmqzNxQL_IXxYwu9MTi0QZSYR4ZheMRqVloWlSbjdxBMCsvQyX5GpEx8DRVIibuOPFIY5BLmB0YB7SLH1mLkW8d7XcLB0PYTVdGtZOgD5lQ2fgORAI4JU1PPmvfcaSgnolr1F8bqUuhyQ2iaNOja5V1BX6xYlSutqzNtGXq-_eReZtOcmJpQGrJHSyiwLy1Sv4Rnvy6Z2OTGmrvUXNQ0UMKzKohRTRRmb8sCh48EkK7WxZiacgvVRl2Aw3QHHe9T8uIO5ql40FcRrJ8nqthgW2ye6C4IZuwJtu490M3I0vaKbd2W63--cuJgCnLG0u1Q
+
+  Upstairs:
+    source: rtsps://stream-uc2-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr8bVUhEuItNd5HpMh3dIsOP3oAr_0TI6LduJ1YGbyCRfEnEAEGF6StHZfq1mt92LJY77FRDm-L-CZEHVReVS8auDAvydv6x440n1xoKZcP1Kx9CkXjRjl-nof7YjLAbLOfg5AGIkNc_JoyXqA4DlgWjYhgsYkc9W6cU6TLZ7UMWBHaEVD6gKu8UaaMOSECKynZwd0Q?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4OX0.qv31dnrEROo-edIxswohkQWU5LtDzQQ2YzipT_mG-tYsZVyrucssTQsOUk8qj7KQzDO2gQP7Z_nbl25G5c3dEBVA6kbcLn8791LTBVsmP1bfCyoh3O-doRfI0QXvkW4fuluqaYZN6omed2gm3tLjnOO8d0Wpjsx0zlpFeHov9tOCZoEnjLpSl2isTcz3VWCzk5GkCE7bZJzsDDHb_668PHBW_V_cKh0DGqH3ZbbmrmJfpJVgwTBvYeGkA6AbwVHHh0fzYjfNDK-0MNY0Kp-ZixrTQ7nKgL4mYIpl5Y9UdoiXGqUhyVlWqiFc0ZqlMze_X4-tBTjN0s9FDEj6C6j9SQ
+
+  Z-Extra:
+    source: rtsps://stream-us1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr_vF9y5Dl3mCkNST-eyutcdvTL5kAdpLZqKcW2bwIsbwEnEAEGF6Sg0cO34X30e6OEPnssDjcssMr_jzGCGlSRAg6nzWxHIZxE15ISn9O5J5UQw4ZHGaUtLLR6KQmkgkDqxXTGtdEiT9HfDTfIyNJrY21oAp-oj2fatOtgZLKDVqVwVDfePfNjG6pcXfNZQX6K31hQ?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI4N30.CW4ehytHeTbKyaoR202vMC5adQlDJ1LbIJLyjZY7H3f2flP-UQd4Y6UzQbq5HAEsH7EUqmxU4E9KZJkq694JQad6-096UrpLJhvaOe1WVzSFZen88o-siPQmf2IlN0NrQ315D-aBNTRz6oILcTlPqgCvoLTVaoRUx_XeOH66BlH5iPWV0RwvSilerecOnAzKAqjHtsFB3Sfcy4YpX4G1L0BeuS9GmDqmfMl7e9AjEPQgd8Dv1VcKXncIikXJXAQgGcctnfhT7iDwwDj32bnhyRJqRUDS9u1O0DP5x-oZLQPuY_1UR2r8muj_WWvUGEp_xpj3v72x2h2a07AZLfwg3A
+
+  Z-ExtraBedroom:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr5uHaSO_v63WBVg71EtuktQT--owSPWF_-Kfdn9ZZW8wEnEAEGF6SlcZVrgKPJ5wHzea5opPYcWv5LVCbE7HgRV9o1MuW9ec_OTt9Vf7MNp_FdweIo333XazkDNB3_DIAYxEigBp_a0ehZ3m27KQUXEBjRBlyMqq0xkG3UkD267eRP63Z319uiOmQzfjlLs6pNARWA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzI5M30.Xxyin5vBE6zYPORuznTZsWJ2WQEeBSjtWduk7e9Evx5A0orxCNzZYVjnglR4_bksF-5YTNHCDUM0CS3vbFADNiXParGxWDD9iHGs2EZKzpAQtoa1URUXQXFY2vDgTIGE3dqxSU_YJ_jK4VWpyjad_dVnkAN0C0dGZPiyl5TeMxa_N_NEBC693aUeKlFu0oLK7924DckDT1tK5CsPKzMThH0PXf2oojQE_earwEegVkgRI1ozhULrfHPLNCYkkFleZjm4FYwgMGCX-n6_bUhszrxQRZu2ni13lxVUcf0kAvkkrQRpcYvI3jA4w9X3RafJJEQi9gaTBqW7_Wf30_qEzA
+
+  Z-ExtraCam3:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr32E11B1alS1QRyq7w4mwEX8NRJEhMnJ_m2mTO9EiXXCEnEAEGF6SmAHpELf7bUIco7Dx3enLdzFi5ICZdr3TMJkU7M3y6Qb_ZnX8NDbPoJElsYLD4fdAUXjCrVyrmZiosKBjdJT7-6ORZq6Nh1LWiVJsrSBhucKoqWH0zITpSaqPmwna2xk2-vpTp-Eygr_qaEBOQ?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzM1N30.SdMmQzmtegw3iCi_00vTBuCKdJKdhs_p0f0N5SVdG8wO4_xaOEUoSri-eYz2JJ56d7PaUreS17niGyI9fIPlHmWp9JTZCfmkEwCYrgW-x7t-csdU1QkXOlpo7CfCaU-kU2GGF_K0qQr5XKgHo_OYuDh8EJTMFpNzfcmq51D5VEk8P8ksPEeUNld-xl7BgO0844T-FjXMk7MKqMDYoum6qwYYwtwVGSP5V0KkMgg50E8PP_rUfm6bKp4KG2i50PGxcNOWFi2Uz0EVH1Q8rmCfX6TWHJb-n3I9I2XH6zv3Z-zjLba7fxvSdgmMjPgRfEF61xNOwnOkja3lqva7I6cWkw
+
+  Z-ExtraOffice:
+    source: rtsps://stream-uc2-alfa.dropcam.com:443/sdm_live_stream/CiUA2vuxryU3b8fBywXLklvSmjsNWaOafqv-LOyN4q6GZibDvCHrEnEAEGF6SvqzNnPtQJuqVJpvpGLrpgENxzbbUwrVY5iEn8BC04pDpb9XaZOlBfyJS3Xho5pjXEg-h500j8R2thZ0iWRoI6geKkR-2eraPXlIc-2mZvpM7S7VXlHuyo7xguk4FK6oMqJrgH1zTa74p9TlPQ?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MTc5NzM1NX0.qjySNsrJ2eHiffkrkpq48KhiOCBZ6FpwF_2l_-3B_VKB494kNhzER1C3kjWzhOOXkU7_egiZmV0TmB-6rceXy3989okbZxL35K2A0ogyI6XVWFF7yeAclgn_w2O3UzmlwuxdetikyzzMRrEu1npy7CF-ZsYX_tNFnlEgb9ZjJiKLZltgMCZS8w7GQldiZ2i1FrQRvpN_HwTdJsAcLkTG9Vh9m-oQwOTqjOwm7pDuKhfPy6R9vuwbTO3MXQKbDbdoL1ukCsQIenx0cnb8aGW6IDZHb4Yhz3svB2FKVfqPsFJwekezU8-sG48puLRFnhgt22JaanrgqytqZD7_UNo-tg

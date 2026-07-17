@@ -11,13 +11,13 @@ class AuthCredentials:
         """Class for holding authentication information"""
 
         self._client_id = configuration.get(
-            "AUTH", "client_id", fallback=os.environ["CLIENT_ID"]
+            "AUTH", "client_id"  # , fallback=os.environ["CLIENT_ID"]
         )
         self._client_secret = configuration.get(
-            "AUTH", "client_secret", fallback=os.environ["CLIENT_SECRET"]
+            "AUTH", "client_secret"  #, fallback=os.environ["CLIENT_SECRET"]
         )
         self._project_id = configuration.get(
-            "AUTH", "project_id", fallback=os.environ["PROJECT_ID"]
+            "AUTH", "project_id", #  fallback=os.environ["PROJECT_ID"]
         )
         self._access_token_cache_file = configuration.get(
             "AUTH",

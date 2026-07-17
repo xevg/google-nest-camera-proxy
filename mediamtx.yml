@@ -1,0 +1,339 @@
+
+###############################################
+# General parameters
+
+# Sets the verbosity of the program; available values are "error", "warn", "info", "debug".
+logLevel: debug
+# Destinations of log messages; available values are "stdout", "file" and "syslog".
+logDestinations: [stdout, file]
+# If "file" is in logDestinations, this is the file which will receive the logs.
+logFile: mediamtx.log
+
+# Timeout of read operations.
+readTimeout: 10s
+# Timeout of write operations.
+writeTimeout: 10s
+# Number of read buffers.
+# A higher value allows a wider throughput, a lower value allows to save RAM.
+readBufferCount: 512
+# Maximum size of payload of outgoing UDP packets.
+# This can be decreased to avoid fragmentation on networks with a low UDP MTU.
+udpMaxPayloadSize: 1472
+
+# HTTP URL to perform external authentication.
+# Every time a user wants to authenticate, the server calls this URL
+# with the POST method and a body containing:
+# {
+#   "ip": "ip",
+#   "user": "user",
+#   "password": "password",
+#   "path": "path",
+#   "protocol": "rtsp|rtmp|hls|webrtc",
+#   "id": "id",
+#   "action": "read|publish",
+#   "query": "query"
+# }
+# If the response code is 20x, authentication is accepted, otherwise
+# it is discarded.
+externalAuthenticationURL:
+
+# Enable the HTTP API.
+api: no
+# Address of the API listener.
+apiAddress: 127.0.0.1:9997
+
+# Enable Prometheus-compatible metrics.
+metrics: no
+# Address of the metrics listener.
+metricsAddress: 127.0.0.1:9998
+
+# Enable pprof-compatible endpoint to monitor performances.
+pprof: no
+# Address of the pprof listener.
+pprofAddress: 127.0.0.1:9999
+
+# Command to run when a client connects to the server.
+# Prepend ./ to run an executable in the current folder (example: "./ffmpeg")
+# This is terminated with SIGINT when a client disconnects from the server.
+# The following environment variables are available:
+# * RTSP_PORT: RTSP server port
+runOnConnect:
+# Restart the command if it exits.
+runOnConnectRestart: no
+
+###############################################
+# RTSP parameters
+
+# Enable support for the RTSP protocol.
+rtsp: yes
+# List of enabled RTSP transport protocols.
+# UDP is the most performant, but doesn't work when there's a NAT/firewall between
+# server and clients, and doesn't support encryption.
+# UDP-multicast allows to save bandwidth when clients are all in the same LAN.
+# TCP is the most versatile, and does support encryption.
+# The handshake is always performed with TCP.
+protocols: [tcp]
+# Encrypt handshakes and TCP streams with TLS (RTSPS).
+# Available values are "no", "strict", "optional".
+encryption: "no"
+# Address of the TCP/RTSP listener. This is needed only when encryption is "no" or "optional".
+rtspAddress: :8554
+# Address of the TCP/TLS/RTSPS listener. This is needed only when encryption is "strict" or "optional".
+rtspsAddress: :8322
+# Address of the UDP/RTP listener. This is needed only when "udp" is in protocols.
+rtpAddress: :8000
+# Address of the UDP/RTCP listener. This is needed only when "udp" is in protocols.
+rtcpAddress: :8001
+# IP range of all UDP-multicast listeners. This is needed only when "multicast" is in protocols.
+multicastIPRange: 224.1.0.0/16
+# Port of all UDP-multicast/RTP listeners. This is needed only when "multicast" is in protocols.
+multicastRTPPort: 8002
+# Port of all UDP-multicast/RTCP listeners. This is needed only when "multicast" is in protocols.
+multicastRTCPPort: 8003
+# Path to the server key. This is needed only when encryption is "strict" or "optional".
+# This can be generated with:
+# openssl genrsa -out server.key 2048
+# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+serverKey: server.key
+# Path to the server certificate. This is needed only when encryption is "strict" or "optional".
+serverCert: server.crt
+# Authentication methods. Available are "basic" and "digest".
+# "digest" doesn't provide any additional security and is available for compatibility reasons only.
+authMethods: [basic]
+
+###############################################
+# RTMP parameters
+
+# Enable support for the RTMP protocol.
+rtmp: no
+# Address of the RTMP listener. This is needed only when encryption is "no" or "optional".
+rtmpAddress: :1935
+# Encrypt connections with TLS (RTMPS).
+# Available values are "no", "strict", "optional".
+rtmpEncryption: "no"
+# Address of the RTMPS listener. This is needed only when encryption is "strict" or "optional".
+rtmpsAddress: :1936
+# Path to the server key. This is needed only when encryption is "strict" or "optional".
+# This can be generated with:
+# openssl genrsa -out server.key 2048
+# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+rtmpServerKey: server.key
+# Path to the server certificate. This is needed only when encryption is "strict" or "optional".
+rtmpServerCert: server.crt
+
+###############################################
+# HLS parameters
+
+# Enable support for the HLS protocol.
+hls: no
+# Address of the HLS listener.
+hlsAddress: :8888
+# Enable TLS/HTTPS on the HLS server.
+# This is required for Low-Latency HLS.
+hlsEncryption: no
+# Path to the server key. This is needed only when encryption is yes.
+# This can be generated with:
+# openssl genrsa -out server.key 2048
+# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+hlsServerKey: server.key
+# Path to the server certificate.
+hlsServerCert: server.crt
+# By default, HLS is generated only when requested by a user.
+# This option allows to generate it always, avoiding the delay between request and generation.
+hlsAlwaysRemux: no
+# Variant of the HLS protocol to use. Available options are:
+# * mpegts - uses MPEG-TS segments, for maximum compatibility.
+# * fmp4 - uses fragmented MP4 segments, more efficient.
+# * lowLatency - uses Low-Latency HLS.
+hlsVariant: lowLatency
+# Number of HLS segments to keep on the server.
+# Segments allow to seek through the stream.
+# Their number doesn't influence latency.
+hlsSegmentCount: 7
+# Minimum duration of each segment.
+# A player usually puts 3 segments in a buffer before reproducing the stream.
+# The final segment duration is also influenced by the interval between IDR frames,
+# since the server changes the duration in order to include at least one IDR frame
+# in each segment.
+hlsSegmentDuration: 1s
+# Minimum duration of each part.
+# A player usually puts 3 parts in a buffer before reproducing the stream.
+# Parts are used in Low-Latency HLS in place of segments.
+# Part duration is influenced by the distance between video/audio samples
+# and is adjusted in order to produce segments with a similar duration.
+hlsPartDuration: 200ms
+# Maximum size of each segment.
+# This prevents RAM exhaustion.
+hlsSegmentMaxSize: 50M
+# Value of the Access-Control-Allow-Origin header provided in every HTTP response.
+# This allows to play the HLS stream from an external website.
+hlsAllowOrigin: '*'
+# List of IPs or CIDRs of proxies placed before the HLS server.
+# If the server receives a request from one of these entries, IP in logs
+# will be taken from the X-Forwarded-For header.
+hlsTrustedProxies: []
+# Directory in which to save segments, instead of keeping them in the RAM.
+# This decreases performance, since reading from disk is less performant than
+# reading from RAM, but allows to save RAM.
+hlsDirectory: ''
+
+###############################################
+# WebRTC parameters
+
+# Enable support for the WebRTC protocol.
+webrtc: no
+# Address of the WebRTC listener.
+webrtcAddress: :8889
+# Enable TLS/HTTPS on the WebRTC server.
+webrtcEncryption: no
+# Path to the server key.
+# This can be generated with:
+# openssl genrsa -out server.key 2048
+# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+webrtcServerKey: server.key
+# Path to the server certificate.
+webrtcServerCert: server.crt
+# Value of the Access-Control-Allow-Origin header provided in every HTTP response.
+# This allows to play the WebRTC stream from an external website.
+webrtcAllowOrigin: '*'
+# List of IPs or CIDRs of proxies placed before the WebRTC server.
+# If the server receives a request from one of these entries, IP in logs
+# will be taken from the X-Forwarded-For header.
+webrtcTrustedProxies: []
+# List of ICE servers.
+webrtcICEServers2:
+  # URL can point to a STUN, TURN or TURNS server.
+  # STUN servers are used to obtain the public IP of server and clients. They are
+  # needed when server and clients are on different LANs.
+  # TURN/TURNS servers are needed when a direct connection between server and
+  # clients is not possible. All traffic is routed through them.
+- url: stun:stun.l.google.com:19302
+  # if user is "AUTH_SECRET", then authentication is secret based.
+  # the secret must be inserted into the password field.
+  username: ''
+  password: ''
+# List of public IP addresses that are to be used as a host.
+# This is used typically for servers that are behind 1:1 D-NAT.
+webrtcICEHostNAT1To1IPs: []
+# Address of a ICE UDP listener in format host:port.
+# If filled, ICE traffic will pass through a single UDP port,
+# allowing the deployment of the server inside a container or behind a NAT.
+webrtcICEUDPMuxAddress:
+# Address of a ICE TCP listener in format host:port.
+# If filled, ICE traffic will pass through a single TCP port,
+# allowing the deployment of the server inside a container or behind a NAT.
+# Setting this parameter forces usage of the TCP protocol, which is not
+# optimal for WebRTC.
+webrtcICETCPMuxAddress:
+
+###############################################
+# SRT parameters
+
+# Enables support for the SRT protocol.
+srt: yes
+# Address of the SRT listener.
+srtAddress: :8890
+
+###############################################
+# Path parameters
+
+# These settings are path-dependent, and the map key is the name of the path.
+# It's possible to use regular expressions by using a tilde as prefix,
+# for example "~^(test1|test2)$" will match both "test1" and "test2",
+# for example "~^prefix" will match all paths that start with "prefix".
+# Settings under the path "all" are applied to all paths that do not match
+# another entry.
+paths:
+  all:
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+    source: publisher
+
+    # IPs or networks (x.x.x.x/24) allowed to read.
+    readIPs: []
+
+    sourceProtocol: automatic
+    # support sources that don't provide server ports or use random server ports. This is a security issue
+    # and must be used only when interacting with sources that require it.
+    sourceAnyPortEnable: no
+
+    ###############################################
+    # Redirect path parameters (when source is "redirect")
+
+    # RTSP URL which clients will be redirected to.
+    sourceRedirect:
+
+# NEST EDITS BELOW -- DO NOT EDIT THIS LINE OR BELOW
+
+  150DiningRoom:
+    source: rtsps://stream-us1-charlie.dropcam.com:443/sdm_live_stream/CiUA2vuxrznjv42_CiXTb50lJsAgY6LKtyAxDUwZrp7EHmdwIl91EnEAEGF6Spun9hXA5u2otRi63xRDVPylCAZCkPGf5PXAuBhaWLjDWbKzdEXnSQjgZ2_fXYKIQKQHuQJ0PQiUyYB5f0pyl8TeYUjGr50VADLnwMY0ZQGUUuTDnPr2JqNcH9QnSdAg3LpeEqoUZFnyiyrAbw?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM0MzczNn0.WTJTsWLIHwtvFrzuhXpA_pOLGfwVgy7JYyDM7u2T6Y8wOywGEXN-XUT-jbBdA5sLSujwIuComTpe1glNXKkIpC-zRDB6B1Coiw0J7UPH66bDAa3DwiOBoMkU9EvVsojJ5OaJjtkCz3dScfhKwZWxVblSmooE2_VIFfU2KbPuGXmngZiatGUp18cLYG9Uq5Q5vlrkyYfvERQxI-AD61QeFsaiTWoYlw24zb4_nAFVDo-oVQPqBPqmVHNgU9hu-FZX-m_bb-VWdFYukKZIYRYlW7yN77T8j6rDXyQsE2UqPC5g4sEOtL_b_RocBexeuFr-UL4LFil3Xc7Xraj9joXHGQ
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  150Kitchen:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr2oc446xeqk-YEvFIptZlUOt8h8VnqLw_tcf5RIULZfREnEAEGF6Smm5JHEu8Jm60BIITxqccHJPv7oHMwxdVHekglQ3ZAgbJV0FFUGrVWZwcoXu_xSlJ1aP262TEjyHmkvdzDA44UhTzJ_FEg5gQbgO0Lkv8IYNFZEkwUAdd-9MN33_1QtS3AEvaF4l6CLw8nBquA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2NDkzNX0.Fhe77UKOLu7c45C01DHoq9-yr5XBXD3XzVkba8ZlvStpQibZz12o5lLUnwRLKEyqt9ujUUwS_2AkUEWT-5svVRe45hawl3cHvpmsPKvtqCF5fgH5Qc09auoTIpCMBldaY8ZtWbTI3bhFU7HZIbpxv8Mj5yQxONWCh7_vebBYXn1zXdmJgSoc6ONmjuUK13USSUkUzmG-IH3gJU-Q9VRhKEo-fmKKfcqHaSoKfHGJVK9oatDTzMiDntKzUA6_AWOdFmt23H4zamKfPnjL1TzOFTS28HSo1OG3vqUj7AUtvp_8T8JXjb6DuukAPrLIdcKkjcnbN6usFZ_RAEDwzLgJqA
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  150MasterWindow:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxrwXqD1AKHuXvN1ntghptZX9AAsvU8HWtzAFlzh59Pmh5EnEAEGF6SsY1RZ0mh3k7EOyfrWZ8CVu_IRcrCXarG_R7UJQNTlV2XUGV1lM5T61YSe5ikT9z2Phzw7m1WKAzWUB27jeL6lS9gEwFVWWGGqfBZVEFJO-l6JA-duy9gtnvfkLQ3dWV9yAkNqbIi2XTlVEzzA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM0MzQzMn0.GWfTGhz3pJwomtEXWgHn5pWl1oQ9ZYjbQTSmeE8oKw3l3lSvL9Oi9_nTkVQLoLLa5ahl80QYmiq3h3Tz_SW2eHQStKo1EqHi9K8EKOtvTjjmZthCdjogHswRU4fg-iBzH5QHkbRpWFkinVBr5S_1jhPkDogYlpdzGixlTVBAPQSZSxDU3x0ycP6JbhmHKKm0wu3tf7oTLC1enBsID74Fus9u-YVbIWLvGs9v2S-jJKh9Sj4XrkIeEf2URtm0_Ajnu6P6o53E-zIuXUPsXHQ45ZViPcVNOzH1tlMjHfNj9bSdlL5nVZJ6vQ1LAIlXVFw_1EY2GAmLwauOrAVMg1CB6w
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  150PatioWall:
+    source: rtsps://stream-us1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr_cvtm4aSudq0uZ_Qyxz3AdFnpKu9BoLidjNIZn0jgUdEnEAEGF6SoA4sEwMn1HS_jYUpk0R24sUYw1fFLPLp_YkITGChflTivai2fLsH8LRFIfeABQSg_BDirMS3-KjrNNmBJLXj8e32F0ABQ7DCwT6Imkyjzmz9UjhEDNzXfGGXCtcgau85Y7NSdFZg9JceKNWgA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM1OTY4NX0.dtvsA8pihUmI2i4fXcd1k9QYflJNCdMBwXE7b1Ley2pHMk92C7kwZAvestpEKi1gyR4XuvfE9D44id8jxEQEkR76w9LVETIwdDEHM0Z0HzEbvTeWlwNu_kUp5wBdsIz3kW2CB-R1utlFBowFOeRtKWVB7E0TVas1q6AzsN_tRSOt0niQr8AdAtXcXhuzPnBDa9250iJhoUnnuAA2ZZXZ1CULSYkKm1D3KXBKOyQOVeXTDvUpgHAcuSVlDOkUD5zc_ZpeuW-360NZTeMbu6W5M_T8gj-QlUPdX2rR5ZnG7qBXuwKUM9oAi_tEEEE3eVUnMY7GmJ3TAYM8Pxua56JYdA
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  150PlayroomCam3:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxryQH3KDxtgFvabEt-QjCknJPUfymk_mKlaN3YH5Mt2_ZEnEAEGF6Sls2YNiTFb-RAwi9pHE53edJYATv9ObdYRaeSmvXK6mRT9Pg8WLbxgC9WHYBfkI9YDiukrsY-HmromAurjWMfnkGvT124B0DgqEyswzwTdNebO-wgxi9IELF7-HqUvcjIB7LMh974vkmrOzodA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2NTg4Nn0.YD9xdUZRG1sjwh69zUjH0MhDSw9w8kYfW7iB-_ZAmclKchiipem2dLcxuXj3k9V51Rg7A1xNOrzEpf7b_63qm6pDBsbEq-fYw8yFe-4rsZrc9593lcWefXih1K84eSnCJJuEKIsCchcN9pjG5FZW5maHHczyU_WMcYk7WaGSZ4fiHJchFl1Zyr8pt8IomexdPj6Naiuzile28C4QIqmGoQbZoDuDXzBuo3qEUyXRs2oo2T2GLhiUGjqZFHCeM4VuzVQ6S4UTekerpKPa6-aGJcvfDbS4NSOXI0kfh97YyKWLnx8t5-Zm5dsLMXyu2zHXFfciQIJ04W_dmTOznbYLvA
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  Cam3:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr49-XsC7e9YWiHbFplnL4H1tNWcTQLzK9URr4ks8fbFmEnEAEGF6St_UKcze11uM28jnBxzUqV0QTRBvg2z11-JwQTqB6TEnjZeDDg3wTG8TOgevcjViGur7Gaisa351Ef6Me66N33O9EYZCg9cO0lvkzdsYt9xUAOUrXO3zR1hSjdB9LeUJlsozTnJyafYw5kX0Hw?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjMyMjM1N30.kQUOAai67aBLE4WIjQpPe9jAcET8isqDV5Z_0HWrnTO6L_Ew4Bd59gQLlzzKId3bR1bGKsMGXNnp-bO0Pto193RsedJmuub9DxpLpAh-TIRXiSqpdoFwm0vlD2U47cRv9WBz3lohyUS2u0PrbmJaE6sBl3iyXog6WSlwumJ1iKIaRdfbm_Kc2TBhNiCs6tkxFGFFWQSKCmjU4Mldo0uDpySoReOyKeC24cEjP04HJcvxTFnT8pQQxIkfMejfHKzkMacdjbFOexnraWps81oVCV--6htpv9lXNZbU-LE-wDdXKdHSfOEui7WJUCLSybLHXOuR7sXlVdj5TrALvYq4Mg
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  KittenNestBedroom:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr3K6otmGWZEQQ4wWqRZgfmyBdHkTe4-3p7LgmOgmV8eJEnEAEGF6Sl8xeewfjyC6bySpHOZBeX6zB0-GtGwbAyVu1CZoYbGMgKu4GouXWJXrt50hVo_qz0Qn2fc-yr3aRfEsXz1g0OO5xi8e6nXYOYU80i0d5ANtfeCjdKKDN2Ko-2X8rO-ZnxRofskd4hKy1FxeuA?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2NzU1N30.pqQSyDohHK1UUNJARdWxj9KLkEUivzN0ahhZ_YWsIIOXxhpfEytJTV-NciCjJsBtftF5qthPSFlexx-3mG4l57bZkyyGdt8CnA5o5e9Bv-O7C2ZAbLwOGR0wRKDqU9mQq9qR6ALWwIR0pkiR045PYiKGexBgDVsY2jAardntIGlt845X6YN4NLctYwH9yiKMRV581gMko-NvxeEuTYm1fonK7Ld6BqJzygo-dact-KD2NRq_fWpA5Ur4x9v9dcfqlGLwJAiroQybR6B4kywv9BWgWZXPTuqC7pjtRYDrzoaRK1BtSRV8JfrjPXKcL0CK0r7-orJvsgbXEHCd99lmqg
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  KittenNestLitter:
+    source: rtsps://stream-us1-charlie.dropcam.com:443/sdm_live_stream/CiUA2vuxr6NhS_bMNm7WdboMKPE1VL1OdUKg3N5wao0EaXkvd1NlEnEAEGF6SlEgzKvh7ZcGP4EQ9rP2VBk9M6zLSX0x3kGeOSHl7dCv8S5-ja8T90KLkRLJmgw0dUa3BsYxtDr0SCV79LbDvgGmTNF6yUJ-N5Xl0wYe_175h4zGoEk1WynGaqVIidAOsIOnh9jNEo6_X8YEmw?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM0MzczN30.OxFxuR4wBhW0bUb4oqvTLGa3__qS-iXSOv7vDbkBCo7rJn2YJtOUXpwiw8KHmQstHJvu2r_K1u6hfuQ1WvfEahFVRORTCPoCrnbAmZwXPaY4PC4mhbOqGulVblj-o047Lf5U2MZ7yGxTmw8TrxBVmGuGci4Zkmf77m86GLSiSwhVeqB0OQ1Y_bLaFC174deKAE5jVGYpZP4lZ4KQMjVCPWn1_KZKyriwh6GMt_aLEwy74EinIibOhcJ62Mi46vmIN4AI_TPNpRgOqNt5zUZLGHim0-LdVYmNufzu6An9_TcrwBmjNTIMFHLwxjzZA9HDu602Tkqc5fHIirV7DC5-0Q
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  KittenNestOffice:
+    source: rtsps://stream-uc2-alfa.dropcam.com:443/sdm_live_stream/CiUA2vuxr3fUbuRT6-MsEFpgkF6cyrAFUhdtmgLdVJWkuQTKkV06EnEAEGF6SpbN1gDbz_mKDpG041NeS9vNUCupTCQy9HFgO6XIJtfa7hK7IOaaL04X5C1dJkOrgiq9sT0kgCLcpNdRGNc1dQ_15NCPViHsmUSNy-1HC4NdGdhpGX0hEm1_C7c7JB4INairLxXAo6QwDPuyGQ?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2NzYwNX0.POnBAKqYbBNhkAJP8Cyuw3MuZoSbd1uy_gkY1x2OID6NvGWJRgGZtSO8K5z3LaGvMVl3krH6Otg4DzB2ekpVkxQB42jcIwI8l38x4oCOOjFumff63YTeeUrebo8FkejNbt21Ht4No0tkECxdFHAXd8R-i8rGqC3eP4tP3760g4Ga2zcdB84K7c63Qv_b9FNn9kgD9ojP8ysG1_nFW4v4LNOMl-zIGbRfm0Afl_Qi9hMfEo6vvdsVWqC1ur7DoENUX24uUpMotJ2hTwHOTMlYjI_vMsEq1WB75hcJJyUePrX_XFNIW7VwFZe64Py6YiQ2ldsWH9BoGn3doJA7EYs4pA
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  MaxineBedroom:
+    source: rtsps://stream-us1-foxtrot.dropcam.com:443/sdm_live_stream/CiUA2vuxr3sBTFoEgzj5IgISsUcNsvaze7nGghR_e_gHvDdJS33nEnEAEGF6SlGdTLDmlPFoWmqoCDCoog2pBeFyfXalurQ2toPW6tyziZwCuDe26be6xHKtW9Ifiub8xwMLkJm2ouALkIIHPF8BDPKM0f9PCyfd75Pp_cuxKElurBpeuF72KDxNzh8iqyHfF4cH-r4x-dwGZg?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2MTk0OH0.TVZupH9JDNfj7-Gqf5kYHps_t2jti-9tx-RsCoYOaFBFbs8TLBLjnMO0sBFhbVrJyUUnrvgDKXNse6QbCZTiwBboRNYUpY6F5g-1XQPx0h2EsBtzaWRbLCqeukjOiAT8EroFe2qW-v5j4U-UyLVnOmqkRDFtsC8GPnw3jkyMQarmT9YleV0PAUeGQWUefdYFPAWynejlUNg_rzo6YC1qXKnHszm71LfTgygAgOijZEP8v3j-wmDkyD8xrU_XCoAcGGTnMSywKDUSwFcZKXJVuHlAbWAO7LURPfMNwDBHzvKqE_zpSfof_Nyq0fBQkogVGieIkeEIMp-8XTMQrNNYIQ
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  MaxineKitchen:
+    source: rtsps://stream-ue1-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxr0ymJRwh46LLRfaCYc94tLenwkSZY006oxamo549XfWiEnEAEGF6Sm3rVyrLQE3cpn6COrUikCJdJy1w04gsSGl0y7N7_Oa1gVp5p0swnQbs_HuI8seSPQLlE_QHB3zFIXTZ4n7M-X2-0_Q2nJ8qoehnShc1FHxs8oU70Nk1H_Gm3PnHUbaWpxv6KUNuLQ8F4oDscg?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM2NDkzNn0.DI55ykEv3zysNIVCbSt_x-c3EXth0PiQifRXbC-bYeo8EYGlflSOQT7ANFhBsgQ-QI4IYqYgrbW_PMPsF7VeCrCcRbpQll9iJtaSvPBULIvKOopSChaeVjQAiG-2SFNvkWM2ifj3qy9JFjxG-0yjdLdz9juV_nZMJ4BxwS4jIITzQ-IbR-wb6_vI_HgTkNbbg4AlxGJmnRgi0XcWXRv7_nEdX7Ik7n6XzaDHpgF13WjWE8Jc1J1zZ2_CvBst_x6S17Ev8nIdg02obxT2_w-AW9LHX8rTCvegssntd2T7F4gGNo2-koof5d87M11munREDcxOtoQVcn94zIUrlBdNvw
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
+
+  Upstairs:
+    source: rtsps://stream-uc2-bravo.dropcam.com:443/sdm_live_stream/CiUA2vuxrw4rg3ZVuEVEdhV337TXDp0n8-9W-Rum98atdMnbnDgaEnEAEGF6SuVeBEQ033OR_n1k3sZTUfbchvnrXk5uV82DPqpbekA5nJPQ5N6zD-74ftJr30bRZTd6n8KgXei1KLlY3WUmFTdz0q7qHEMjkTr3BqkAFL2QwG2U8Oj_OWFvzLe8Vm4OUFs_tSOc_PX55agQ_Q?auth=g.0.eyJraWQiOiIyMzhiNTUxZmMyM2EyM2Y4M2E2ZTE3MmJjZTg0YmU3ZjgxMzAzMmM4IiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJuZXN0LXNlY3VyaXR5LWF1dGhwcm94eSIsInN1YiI6Im5lc3RfaWQ6bmVzdC1waG9lbml4LXByb2Q6MTQxNDQwMSIsInBvbCI6IjNwLW9hdXRoLXNjb3BlLUFQSV9TRE1fU0VSVklDRS1jbGllbnQtMTA2NTg1OTY0NjQyNC1scG9mbWVkZDRqNm5lYzVwbW1tZ2dzM2R2MjNzcWN0OS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTY5MjM0NDc0OX0.CngxT2Q2FWvjrGvLPdm7qMRBN1WYyDCFCat5-0gJODbzzBhFwOf1cga0ZOECXJO5UyJ1wQEswYz-u8TEYSAyahoGXVQGQndGame2MdwyCPiTgsTqQLGBqdftnW8EfBHeTQNY5cP6hOCVt6NMBskONYITriPjjVUX5HhVX7FBIL2OqRAgmUoe_frqcRIZZ7DXNsspfRJmucFiePoMwUSSqh7zgKZ-VVa9LsPwpHZR8NPb1q9SUKdnycaz-w_Sk6OjueWAMyAJDGGflo3IAz2ORUurh6ZDo7P7wcRo-dyhgjUHuMLepXZWZBVUOS7McQbRyUHSVGWF0TvLsUQqwPGcrw
+    readUser: admin
+    readPass: xijne6-qevsis-Xigjib
+
